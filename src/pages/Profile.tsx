@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, User, LogOut, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -13,6 +14,7 @@ const Profile = () => {
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [gender, setGender] = useState('');
+  const [country, setCountry] = useState('US');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -36,6 +38,7 @@ const Profile = () => {
       setFullName(data.full_name || '');
       setUsername(data.username || '');
       setGender(data.gender || '');
+      setCountry(data.country || 'US');
     }
   };
 
@@ -49,6 +52,7 @@ const Profile = () => {
         full_name: fullName,
         username: username,
         gender: gender,
+        country: country,
       })
       .eq('user_id', user.id);
 
@@ -115,6 +119,24 @@ const Profile = () => {
                 onChange={(e) => setGender(e.target.value)}
                 placeholder="Your gender"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="country">Country</Label>
+              <Select value={country} onValueChange={setCountry}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="US">United States</SelectItem>
+                  <SelectItem value="GB">United Kingdom</SelectItem>
+                  <SelectItem value="CA">Canada</SelectItem>
+                  <SelectItem value="AU">Australia</SelectItem>
+                  <SelectItem value="NZ">New Zealand</SelectItem>
+                  <SelectItem value="IE">Ireland</SelectItem>
+                  <SelectItem value="IN">India</SelectItem>
+                  <SelectItem value="ZA">South Africa</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <Button onClick={handleSaveProfile} disabled={loading} className="w-full">
               <Save className="mr-2 h-4 w-4" />

@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ExternalLink, Phone, MessageSquare } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Phone, MessageSquare, Globe } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -9,8 +12,124 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
+const countryResources = {
+  US: {
+    name: 'United States',
+    helplines: [
+      { name: 'National Gambling Helpline', phone: '1-800-522-4700', link: 'tel:1-800-522-4700' },
+      { name: 'Crisis Text Line', text: 'Text "HELLO" to 741741', link: 'sms:741741&body=HELLO' },
+    ],
+    websites: [
+      { name: 'National Council on Problem Gambling', url: 'https://www.ncpgambling.org' },
+      { name: 'Gamblers Anonymous', url: 'https://www.gamblersanonymous.org' },
+    ],
+  },
+  GB: {
+    name: 'United Kingdom',
+    helplines: [
+      { name: 'National Gambling Helpline', phone: '0808 8020 133', link: 'tel:08088020133' },
+      { name: 'GamCare Live Chat', text: 'Visit gamcare.org.uk', link: 'https://www.gamcare.org.uk' },
+    ],
+    websites: [
+      { name: 'GamCare', url: 'https://www.gamcare.org.uk' },
+      { name: 'BeGambleAware', url: 'https://www.begambleaware.org' },
+      { name: 'Gamblers Anonymous UK', url: 'https://www.gamblersanonymous.org.uk' },
+    ],
+  },
+  CA: {
+    name: 'Canada',
+    helplines: [
+      { name: 'Problem Gambling Helpline', phone: '1-866-531-2600', link: 'tel:1-866-531-2600' },
+      { name: 'ConnexOntario (Ontario)', phone: '1-866-531-2600', link: 'tel:1-866-531-2600' },
+    ],
+    websites: [
+      { name: 'Problem Gambling Institute of Ontario', url: 'https://www.problemgambling.ca' },
+      { name: 'Responsible Gambling Council', url: 'https://www.responsiblegambling.org' },
+    ],
+  },
+  AU: {
+    name: 'Australia',
+    helplines: [
+      { name: 'National Gambling Helpline', phone: '1800 858 858', link: 'tel:1800858858' },
+      { name: 'Gambling Help Online', text: 'Chat available 24/7', link: 'https://www.gamblinghelponline.org.au' },
+    ],
+    websites: [
+      { name: 'Gambling Help Online', url: 'https://www.gamblinghelponline.org.au' },
+      { name: 'Gamblers Anonymous Australia', url: 'https://www.gaaustralia.org.au' },
+    ],
+  },
+  NZ: {
+    name: 'New Zealand',
+    helplines: [
+      { name: 'Gambling Helpline', phone: '0800 654 655', link: 'tel:0800654655' },
+      { name: 'Problem Gambling Foundation', phone: '0800 664 262', link: 'tel:0800664262' },
+    ],
+    websites: [
+      { name: 'Problem Gambling Foundation', url: 'https://www.pgf.nz' },
+      { name: 'Gambling Helpline', url: 'https://www.gamblinghelpline.co.nz' },
+    ],
+  },
+  IE: {
+    name: 'Ireland',
+    helplines: [
+      { name: 'Problem Gambling Ireland', phone: '089 241 5401', link: 'tel:0892415401' },
+      { name: 'Dunlewey Addiction Services', phone: '01 853 5444', link: 'tel:018535444' },
+    ],
+    websites: [
+      { name: 'Problem Gambling Ireland', url: 'https://www.problemgambling.ie' },
+      { name: 'Gamblers Anonymous Ireland', url: 'https://www.gamblersanonymous.ie' },
+    ],
+  },
+  IN: {
+    name: 'India',
+    helplines: [
+      { name: 'National Helpline', phone: '1800-11-0031', link: 'tel:1800110031' },
+      { name: 'NIMHANS Helpline', phone: '080-46110007', link: 'tel:08046110007' },
+    ],
+    websites: [
+      { name: 'Samhita Social Ventures', url: 'https://www.samhitasocialventures.org' },
+      { name: 'NIMHANS', url: 'https://nimhans.ac.in' },
+    ],
+  },
+  ZA: {
+    name: 'South Africa',
+    helplines: [
+      { name: 'National Responsible Gambling', phone: '0800 006 008', link: 'tel:0800006008' },
+      { name: 'SANCA', phone: '011 892 3829', link: 'tel:0118923829' },
+    ],
+    websites: [
+      { name: 'National Responsible Gambling Programme', url: 'https://www.responsiblegambling.co.za' },
+      { name: 'SANCA', url: 'https://www.sanca.co.za' },
+    ],
+  },
+};
+
 const Help = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [country, setCountry] = useState<string>('US');
+
+  useEffect(() => {
+    if (user) {
+      loadUserCountry();
+    }
+  }, [user]);
+
+  const loadUserCountry = async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('country')
+      .eq('user_id', user.id)
+      .single();
+
+    if (data?.country) {
+      setCountry(data.country);
+    }
+  };
+
+  const resources = countryResources[country as keyof typeof countryResources] || countryResources.US;
 
   const faqs = [
     {
@@ -19,7 +138,7 @@ const Help = () => {
     },
     {
       question: 'How does the cooldown feature work?',
-      answer: 'The cooldown feature provides guided breathing exercises and mindfulness prompts to help you pause when you feel an urge. It takes you through calming steps to help you regain control.',
+      answer: 'The cooldown feature provides guided breathing exercises, meditation soundtracks, and mindfulness prompts to help you pause when you feel an urge. Choose between listening to calming sounds, breathing exercises, or a full 10-minute meditation session.',
     },
     {
       question: 'Will this app block gambling sites on my device?',
@@ -49,42 +168,64 @@ const Help = () => {
           <h1 className="text-2xl font-bold">Help & Support</h1>
         </div>
 
+        {/* Country Indicator */}
+        <Card className="gentle-fade-in bg-accent/20">
+          <CardContent className="pt-6 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Globe className="w-5 h-5 text-primary" />
+              <p className="text-sm font-medium">
+                Showing resources for: <span className="text-primary">{resources.name}</span>
+              </p>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
+              Change Country
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Emergency Contacts */}
         <Card className="gentle-fade-in bg-destructive/10 border-destructive/30">
           <CardHeader>
             <CardTitle className="text-lg">🆘 Need Immediate Help?</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-destructive" />
-              <div>
-                <p className="font-medium">National Gambling Helpline</p>
-                <a href="tel:1-800-522-4700" className="text-sm text-primary hover:underline">
-                  1-800-522-4700
-                </a>
+          <CardContent className="space-y-4">
+            {resources.helplines.map((helpline, index) => (
+              <div key={index} className="flex items-start gap-3">
+                {helpline.phone ? (
+                  <Phone className="w-5 h-5 text-destructive mt-0.5" />
+                ) : (
+                  <MessageSquare className="w-5 h-5 text-destructive mt-0.5" />
+                )}
+                <div>
+                  <p className="font-medium">{helpline.name}</p>
+                  {helpline.phone && (
+                    <a href={helpline.link} className="text-sm text-primary hover:underline">
+                      {helpline.phone}
+                    </a>
+                  )}
+                  {helpline.text && (
+                    <p className="text-sm text-muted-foreground">{helpline.text}</p>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <MessageSquare className="w-5 h-5 text-destructive" />
-              <div>
-                <p className="font-medium">Crisis Text Line</p>
-                <p className="text-sm text-muted-foreground">Text "HELLO" to 741741</p>
+            ))}
+            
+            {resources.websites.map((website, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <ExternalLink className="w-5 h-5 text-destructive mt-0.5" />
+                <div>
+                  <p className="font-medium">{website.name}</p>
+                  <a
+                    href={website.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {website.url.replace('https://', '').replace('www.', '')}
+                  </a>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <ExternalLink className="w-5 h-5 text-destructive" />
-              <div>
-                <p className="font-medium">National Council on Problem Gambling</p>
-                <a
-                  href="https://www.ncpgambling.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline"
-                >
-                  ncpgambling.org
-                </a>
-              </div>
-            </div>
+            ))}
           </CardContent>
         </Card>
 
