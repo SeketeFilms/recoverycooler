@@ -9,6 +9,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, User, LogOut, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { z } from 'zod';
+
+const profileSchema = z.object({
+  fullName: z.string().trim().max(100, 'Name too long'),
+  username: z.string().trim().max(50, 'Username too long'),
+  gender: z.string().trim().max(50, 'Gender too long'),
+  country: z.string().length(2, 'Invalid country code'),
+});
 
 const Profile = () => {
   const [fullName, setFullName] = useState('');
@@ -45,6 +53,21 @@ const Profile = () => {
   const handleSaveProfile = async () => {
     if (!user) return;
     setLoading(true);
+
+    // Validate inputs
+    const validationResult = profileSchema.safeParse({
+      fullName,
+      username,
+      gender,
+      country,
+    });
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0];
+      toast.error(firstError.message);
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase
       .from('profiles')

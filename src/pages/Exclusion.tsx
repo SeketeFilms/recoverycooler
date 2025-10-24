@@ -8,6 +8,15 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowLeft, Shield, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { z } from 'zod';
+
+const domainSchema = z.object({
+  domain: z.string()
+    .trim()
+    .min(3, 'Domain too short')
+    .max(253, 'Domain too long')
+    .regex(/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/i, 'Invalid domain format'),
+});
 
 interface Domain {
   id: string;
@@ -44,6 +53,13 @@ const Exclusion = () => {
     if (!user || !newDomain.trim()) return;
 
     const cleanDomain = newDomain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+    const validationResult = domainSchema.safeParse({ domain: cleanDomain });
+
+    if (!validationResult.success) {
+      toast.error(validationResult.error.issues[0].message);
+      return;
+    }
 
     const { error } = await supabase
       .from('self_exclusion_domains')

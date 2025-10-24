@@ -8,6 +8,19 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { z } from 'zod';
+
+const authSchema = z.object({
+  email: z.string().trim().email('Invalid email address').max(255, 'Email too long'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain an uppercase letter')
+    .regex(/[a-z]/, 'Password must contain a lowercase letter')
+    .regex(/[0-9]/, 'Password must contain a number'),
+  fullName: z.string().trim().min(1, 'Name is required').max(100, 'Name too long').optional(),
+  username: z.string().trim().min(3, 'Username must be at least 3 characters').max(50, 'Username too long').optional(),
+  gender: z.string().trim().max(50, 'Gender too long').optional(),
+});
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -25,6 +38,22 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Validate inputs
+      const validationResult = authSchema.safeParse({
+        email,
+        password,
+        fullName: isSignUp ? fullName : undefined,
+        username: isSignUp ? username : undefined,
+        gender: isSignUp ? gender : undefined,
+      });
+
+      if (!validationResult.success) {
+        const firstError = validationResult.error.issues[0];
+        toast.error(firstError.message);
+        setLoading(false);
+        return;
+      }
+
       if (isSignUp) {
         const { error } = await signUp(email, password, {
           full_name: fullName,

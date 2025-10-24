@@ -16,6 +16,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { z } from 'zod';
+
+const spendingSchema = z.object({
+  amount: z.number()
+    .positive('Amount must be positive')
+    .max(1000000, 'Amount too large')
+    .multipleOf(0.01, 'Amount can have at most 2 decimal places'),
+  notes: z.string().trim().max(200, 'Notes too long').optional(),
+});
 
 const Spending = () => {
   const [dailyLimit, setDailyLimit] = useState<number>(0);
@@ -64,6 +73,14 @@ const Spending = () => {
   const handleSaveLimit = async () => {
     if (!user || !newLimit) return;
 
+    const limitValue = parseFloat(newLimit);
+    const validationResult = spendingSchema.safeParse({ amount: limitValue });
+
+    if (!validationResult.success) {
+      toast.error(validationResult.error.issues[0].message);
+      return;
+    }
+
     const { error } = await supabase
       .from('spending_limits')
       .upsert({
@@ -87,6 +104,13 @@ const Spending = () => {
     if (!user || !logAmount) return;
 
     const amount = parseFloat(logAmount);
+    const validationResult = spendingSchema.safeParse({ amount, notes: logNotes });
+
+    if (!validationResult.success) {
+      toast.error(validationResult.error.issues[0].message);
+      return;
+    }
+
     const { error } = await supabase
       .from('spending_logs')
       .insert({
