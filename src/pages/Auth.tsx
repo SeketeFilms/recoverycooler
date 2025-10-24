@@ -40,7 +40,14 @@ const Auth = () => {
         navigate('/home');
       }
     } catch (error: any) {
-      toast.error(error.message || 'Authentication failed');
+      const errorMessage = error.message || 'Authentication failed';
+      
+      // Handle specific database errors
+      if (errorMessage.includes('duplicate key') || errorMessage.includes('Database error')) {
+        toast.error('This username is already taken. Please choose a different one.');
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
