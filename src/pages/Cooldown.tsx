@@ -134,9 +134,9 @@ const Cooldown = () => {
           {/* Breathing Exercise Tab */}
           <TabsContent value="breathing" className="space-y-6">
             {/* Breathing Circle */}
-            <div className="flex justify-center py-12">
-              <div className={`w-48 h-48 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-medium transition-all duration-1000 ${isPlaying ? 'breathe-animation' : ''}`}>
-                <p className="text-lg">Breathe</p>
+            <div className="flex justify-center py-8 sm:py-12">
+              <div className={`w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-medium transition-all duration-1000 ${isPlaying ? 'breathe-animation' : ''}`}>
+                <p className="text-base sm:text-lg">Breathe</p>
               </div>
             </div>
 
@@ -213,11 +213,11 @@ const Cooldown = () => {
             </Card>
 
             {/* Visualization */}
-            <div className="flex justify-center py-8">
-              <div className={`w-56 h-56 rounded-full bg-gradient-to-br from-accent to-accent/40 flex items-center justify-center transition-all duration-1000 ${isPlaying ? 'wave-pulse' : ''}`}>
-                <div className="text-center text-foreground">
-                  <p className="text-sm font-medium">{meditationTracks[selectedTrack].name}</p>
-                  <p className="text-3xl font-bold mt-2">{formatTime(elapsedTime)}</p>
+            <div className="flex justify-center py-6 sm:py-8">
+              <div className={`w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-gradient-to-br from-accent to-accent/40 flex items-center justify-center transition-all duration-1000 ${isPlaying ? 'wave-pulse' : ''}`}>
+                <div className="text-center text-foreground px-4">
+                  <p className="text-xs sm:text-sm font-medium">{meditationTracks[selectedTrack].name}</p>
+                  <p className="text-2xl sm:text-3xl font-bold mt-2">{formatTime(elapsedTime)}</p>
                 </div>
               </div>
             </div>
@@ -278,9 +278,30 @@ const Cooldown = () => {
             </Card>
 
             {/* Timer Circle */}
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center py-6 sm:py-8">
               <div className="relative">
-                <svg className="w-64 h-64 transform -rotate-90">
+                <svg className="w-56 h-56 sm:w-64 sm:h-64 transform -rotate-90">
+                  <circle
+                    cx="112"
+                    cy="112"
+                    r="105"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="none"
+                    className="text-muted sm:hidden"
+                  />
+                  <circle
+                    cx="112"
+                    cy="112"
+                    r="105"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 105}`}
+                    strokeDashoffset={`${2 * Math.PI * 105 * (1 - getProgressPercent() / 100)}`}
+                    className="text-primary transition-all duration-1000 sm:hidden"
+                    strokeLinecap="round"
+                  />
                   <circle
                     cx="128"
                     cy="128"
@@ -288,7 +309,7 @@ const Cooldown = () => {
                     stroke="currentColor"
                     strokeWidth="8"
                     fill="none"
-                    className="text-muted"
+                    className="text-muted hidden sm:block"
                   />
                   <circle
                     cx="128"
@@ -299,14 +320,14 @@ const Cooldown = () => {
                     fill="none"
                     strokeDasharray={`${2 * Math.PI * 120}`}
                     strokeDashoffset={`${2 * Math.PI * 120 * (1 - getProgressPercent() / 100)}`}
-                    className="text-primary transition-all duration-1000"
+                    className="text-primary transition-all duration-1000 hidden sm:block"
                     strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className={`w-40 h-40 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground ${isPlaying ? 'breathe-animation' : ''}`}>
-                    <div className="text-center">
-                      <p className="text-3xl font-bold">{formatTime(600 - elapsedTime)}</p>
+                  <div className={`w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground ${isPlaying ? 'breathe-animation' : ''}`}>
+                    <div className="text-center px-2">
+                      <p className="text-2xl sm:text-3xl font-bold">{formatTime(600 - elapsedTime)}</p>
                       <p className="text-xs mt-1">remaining</p>
                     </div>
                   </div>

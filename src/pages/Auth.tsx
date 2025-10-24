@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +32,65 @@ const Auth = () => {
           gender,
         });
         if (error) throw error;
+        
+        // Send welcome email
+        try {
+          const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email', {
+            body: {
+              to: email,
+              subject: 'Welcome to GambleCooler - Your Journey to Recovery Starts Here',
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #6366f1; font-size: 32px; margin-bottom: 10px;">🧘 GambleCooler</h1>
+                    <p style="color: #666; font-size: 18px;">Welcome to Your Journey</p>
+                  </div>
+                  
+                  <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 30px; border-radius: 12px; margin-bottom: 30px;">
+                    <h2 style="color: #1e40af; margin-top: 0;">Welcome, ${fullName}!</h2>
+                    <p style="color: #334155; line-height: 1.6; font-size: 16px;">
+                      We're honored that you've chosen to take this brave step with GambleCooler. Recovery is not about perfection—it's about progress, one mindful moment at a time.
+                    </p>
+                  </div>
+                  
+                  <div style="margin-bottom: 30px;">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">What Makes GambleCooler Different?</h3>
+                    <ul style="color: #334155; line-height: 1.8; font-size: 15px;">
+                      <li><strong>Guided Breathing Exercises:</strong> Calm your mind when urges strike with our proven breathing techniques</li>
+                      <li><strong>Spending Tracker:</strong> Set daily limits and track your progress with compassion, not judgment</li>
+                      <li><strong>Self-Exclusion Tools:</strong> Take control by blocking access to gambling sites that trigger you</li>
+                      <li><strong>24/7 Support Resources:</strong> You're never alone—immediate crisis support is always available</li>
+                    </ul>
+                  </div>
+                  
+                  <div style="background: #fef3c7; padding: 20px; border-left: 4px solid #f59e0b; border-radius: 8px; margin-bottom: 30px;">
+                    <p style="color: #92400e; margin: 0; font-size: 15px; line-height: 1.6;">
+                      <strong>Remember:</strong> Every moment you choose calm over chaos is a victory. You are stronger than the urge. You are not alone in this journey.
+                    </p>
+                  </div>
+                  
+                  <div style="text-align: center; margin-top: 40px;">
+                    <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
+                      Need help? Visit our support resources anytime.<br>
+                      Questions? Reply to this email—we're here for you.
+                    </p>
+                    <p style="color: #94a3b8; font-size: 13px; margin-top: 20px;">
+                      With compassion and support,<br>
+                      <strong>The GambleCooler Team</strong>
+                    </p>
+                  </div>
+                </div>
+              `
+            }
+          });
+          
+          if (emailError) {
+            console.error('Failed to send welcome email:', emailError);
+          }
+        } catch (emailError) {
+          console.error('Error sending welcome email:', emailError);
+        }
+        
         toast.success('Account created! Welcome to GambleCooler');
         navigate('/home');
       } else {

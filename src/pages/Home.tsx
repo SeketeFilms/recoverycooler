@@ -67,25 +67,25 @@ const Home = () => {
         <div className="flex justify-center py-8">
           <button
             onClick={() => navigate('/cooldown')}
-            className="w-64 h-64 rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 breathe-animation"
+            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 breathe-animation"
           >
-            <div className="text-center space-y-2">
-              <p className="text-2xl font-bold">I NEED HELP</p>
-              <p className="text-sm opacity-90">Tap for immediate support</p>
+            <div className="text-center space-y-2 px-4">
+              <p className="text-xl sm:text-2xl font-bold">I NEED HELP</p>
+              <p className="text-xs sm:text-sm opacity-90">Tap for immediate support</p>
             </div>
           </button>
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Button
             variant="outline"
             size="lg"
             className="h-24 flex-col gap-2"
             onClick={() => navigate('/spending')}
           >
-            <DollarSign className="w-8 h-8" />
-            <span>Spending Tracker</span>
+            <DollarSign className="w-6 h-6 sm:w-8 sm:h-8" />
+            <span className="text-sm sm:text-base">Spending Tracker</span>
           </Button>
           <Button
             variant="outline"
@@ -93,8 +93,8 @@ const Home = () => {
             className="h-24 flex-col gap-2"
             onClick={() => navigate('/exclusion')}
           >
-            <Shield className="w-8 h-8" />
-            <span>Self-Exclusion</span>
+            <Shield className="w-6 h-6 sm:w-8 sm:h-8" />
+            <span className="text-sm sm:text-base">Self-Exclusion</span>
           </Button>
         </div>
 
