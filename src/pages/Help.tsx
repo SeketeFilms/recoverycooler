@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ExternalLink, Phone, MessageSquare, Globe } from 'lucide-react';
+import { countries } from '@/lib/countries';
 import {
   Accordion,
   AccordionContent,
@@ -12,7 +13,11 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-const countryResources = {
+const countryResources: Record<string, {
+  name: string;
+  helplines: Array<{ name: string; phone?: string; text?: string; link: string }>;
+  websites: Array<{ name: string; url: string }>;
+}> = {
   US: {
     name: 'United States',
     helplines: [
@@ -102,6 +107,197 @@ const countryResources = {
       { name: 'SANCA', url: 'https://www.sanca.co.za' },
     ],
   },
+  SE: {
+    name: 'Sweden',
+    helplines: [
+      { name: 'Stödlinjen', phone: '020-819 100', link: 'tel:020819100' },
+    ],
+    websites: [
+      { name: 'Stödlinjen', url: 'https://www.stodlinjen.se' },
+    ],
+  },
+  DE: {
+    name: 'Germany',
+    helplines: [
+      { name: 'BZgA Hotline', phone: '0800 1 37 27 00', link: 'tel:08001372700' },
+    ],
+    websites: [
+      { name: 'Spielen mit Verantwortung', url: 'https://www.spielen-mit-verantwortung.de' },
+    ],
+  },
+  FR: {
+    name: 'France',
+    helplines: [
+      { name: 'Joueurs Info Service', phone: '09 74 75 13 13', link: 'tel:0974751313' },
+    ],
+    websites: [
+      { name: 'Joueurs Info Service', url: 'https://www.joueurs-info-service.fr' },
+    ],
+  },
+  IT: {
+    name: 'Italy',
+    helplines: [
+      { name: 'Telefono Verde', phone: '800 558 822', link: 'tel:800558822' },
+    ],
+    websites: [
+      { name: 'Gioco Responsabile', url: 'https://www.gioco-responsabile.it' },
+    ],
+  },
+  ES: {
+    name: 'Spain',
+    helplines: [
+      { name: 'Juego Responsable', phone: '900 200 225', link: 'tel:900200225' },
+    ],
+    websites: [
+      { name: 'Juego Responsable', url: 'https://www.ordenacionjuego.es' },
+    ],
+  },
+  NL: {
+    name: 'Netherlands',
+    helplines: [
+      { name: 'Agog', phone: '088 222 66 77', link: 'tel:0882226677' },
+    ],
+    websites: [
+      { name: 'Agog', url: 'https://www.agog.nl' },
+    ],
+  },
+  BE: {
+    name: 'Belgium',
+    helplines: [
+      { name: 'Joueurs Anonymes', phone: '0800 35 777', link: 'tel:080035777' },
+    ],
+    websites: [
+      { name: 'Joueurs Anonymes', url: 'https://www.joueurs-anonymes.be' },
+    ],
+  },
+  CH: {
+    name: 'Switzerland',
+    helplines: [
+      { name: 'SOS Spielsucht', phone: '0800 040 080', link: 'tel:0800040080' },
+    ],
+    websites: [
+      { name: 'SOS Spielsucht', url: 'https://www.sos-spielsucht.ch' },
+    ],
+  },
+  AT: {
+    name: 'Austria',
+    helplines: [
+      { name: 'Spielsuchthilfe', phone: '0800 202 033', link: 'tel:0800202033' },
+    ],
+    websites: [
+      { name: 'Spielsuchthilfe', url: 'https://www.spielsuchthilfe.at' },
+    ],
+  },
+  NO: {
+    name: 'Norway',
+    helplines: [
+      { name: 'Hjelpelinjen', phone: '800 800 40', link: 'tel:80080040' },
+    ],
+    websites: [
+      { name: 'Hjelpelinjen', url: 'https://www.hjelpelinjen.no' },
+    ],
+  },
+  DK: {
+    name: 'Denmark',
+    helplines: [
+      { name: 'Spillemyndigheden', phone: '70 222 209', link: 'tel:70222209' },
+    ],
+    websites: [
+      { name: 'Spillemyndigheden', url: 'https://www.spillemyndigheden.dk' },
+    ],
+  },
+  FI: {
+    name: 'Finland',
+    helplines: [
+      { name: 'Peluuri', phone: '0800 100 101', link: 'tel:0800100101' },
+    ],
+    websites: [
+      { name: 'Peluuri', url: 'https://www.peluuri.fi' },
+    ],
+  },
+  PT: {
+    name: 'Portugal',
+    helplines: [
+      { name: 'Linha de Apoio', phone: '800 20 20 20', link: 'tel:800202020' },
+    ],
+    websites: [
+      { name: 'SICAD', url: 'https://www.sicad.pt' },
+    ],
+  },
+  GR: {
+    name: 'Greece',
+    helplines: [
+      { name: 'KETHEA Elpida', phone: '210 923 5686', link: 'tel:2109235686' },
+    ],
+    websites: [
+      { name: 'KETHEA', url: 'https://www.kethea.gr' },
+    ],
+  },
+  JP: {
+    name: 'Japan',
+    helplines: [
+      { name: 'Gambling Addiction Support', phone: '050-3541-6420', link: 'tel:05035416420' },
+    ],
+    websites: [
+      { name: 'GA Japan', url: 'https://www.gajapan.jp' },
+    ],
+  },
+  SG: {
+    name: 'Singapore',
+    helplines: [
+      { name: 'National Problem Gambling Helpline', phone: '1800-6-668-668', link: 'tel:18006668668' },
+    ],
+    websites: [
+      { name: 'National Council on Problem Gambling', url: 'https://www.ncpg.org.sg' },
+    ],
+  },
+  HK: {
+    name: 'Hong Kong',
+    helplines: [
+      { name: 'Ping Wo Fund', phone: '183 4633', link: 'tel:1834633' },
+    ],
+    websites: [
+      { name: 'Ping Wo Fund', url: 'https://www.pwf.org.hk' },
+    ],
+  },
+  BR: {
+    name: 'Brazil',
+    helplines: [
+      { name: 'LIDAS USP', phone: '(11) 3091-4511', link: 'tel:551130914511' },
+    ],
+    websites: [
+      { name: 'Jogadores Anônimos', url: 'https://www.jogadoresanonimos.com.br' },
+    ],
+  },
+  MX: {
+    name: 'Mexico',
+    helplines: [
+      { name: 'Jugadores Anónimos', phone: '55 5264 2555', link: 'tel:5552642555' },
+    ],
+    websites: [
+      { name: 'Jugadores Anónimos México', url: 'https://www.jugadoresanonimos.org.mx' },
+    ],
+  },
+  AR: {
+    name: 'Argentina',
+    helplines: [
+      { name: 'Jugadores Anónimos', phone: '0800-333-0333', link: 'tel:08003330333' },
+    ],
+    websites: [
+      { name: 'Jugadores Anónimos Argentina', url: 'https://www.jugadoresanonimos.org.ar' },
+    ],
+  },
+};
+
+const DEFAULT_RESOURCES = {
+  name: 'International',
+  helplines: [
+    { name: 'Gamblers Anonymous', text: 'Visit gamblersamonymous.org', link: 'https://www.gamblersanonymous.org' },
+  ],
+  websites: [
+    { name: 'Gamblers Anonymous', url: 'https://www.gamblersanonymous.org' },
+    { name: 'International Centre for Gaming Regulation', url: 'https://www.unlv.edu/icgr' },
+  ],
 };
 
 const Help = () => {
@@ -129,7 +325,8 @@ const Help = () => {
     }
   };
 
-  const resources = countryResources[country as keyof typeof countryResources] || countryResources.US;
+  const resources = countryResources[country] || DEFAULT_RESOURCES;
+  const countryName = countries.find(c => c.code === country)?.name || resources.name;
 
   const faqs = [
     {
@@ -174,7 +371,7 @@ const Help = () => {
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-primary" />
               <p className="text-sm font-medium">
-                Showing resources for: <span className="text-primary">{resources.name}</span>
+                Showing resources for: <span className="text-primary">{countryName}</span>
               </p>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>

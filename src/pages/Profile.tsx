@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, User, LogOut, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { CountrySelector } from '@/components/CountrySelector';
 
 const profileSchema = z.object({
   fullName: z.string().trim().max(100, 'Name too long'),
@@ -145,21 +145,7 @@ const Profile = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
-              <Select value={country} onValueChange={setCountry}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your country" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="US">United States</SelectItem>
-                  <SelectItem value="GB">United Kingdom</SelectItem>
-                  <SelectItem value="CA">Canada</SelectItem>
-                  <SelectItem value="AU">Australia</SelectItem>
-                  <SelectItem value="NZ">New Zealand</SelectItem>
-                  <SelectItem value="IE">Ireland</SelectItem>
-                  <SelectItem value="IN">India</SelectItem>
-                  <SelectItem value="ZA">South Africa</SelectItem>
-                </SelectContent>
-              </Select>
+              <CountrySelector value={country} onValueChange={setCountry} />
             </div>
             <Button onClick={handleSaveProfile} disabled={loading} className="w-full">
               <Save className="mr-2 h-4 w-4" />
