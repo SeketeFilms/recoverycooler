@@ -1,30 +1,62 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, DollarSign, Shield, User, HelpCircle, LogOut } from 'lucide-react';
 
-const motivationalQuotes = [
-  "You are stronger than the urge. Pause and breathe.",
-  "Every moment of resistance is a victory.",
-  "One breath at a time. You've got this.",
-  "Your future self will thank you for today's strength.",
-  "The urge will pass. Your strength will remain.",
-  "You're not alone in this journey.",
-  "Small steps lead to big changes.",
-  "Choose calm over chaos. You can do this.",
-];
+const motivationalQuotes = {
+  gambling: [
+    "You are stronger than the urge. Pause and breathe.",
+    "Every moment of resistance is a victory.",
+    "One breath at a time. You've got this.",
+    "Your future self will thank you for today's strength.",
+    "The urge will pass. Your strength will remain.",
+    "You're not alone in this journey.",
+    "Small steps lead to big changes.",
+    "Choose calm over chaos. You can do this.",
+  ],
+  alcohol: [
+    "You are stronger than the craving. Pause and breathe.",
+    "Every moment of sobriety is a victory.",
+    "One day at a time. You've got this.",
+    "Your future self will thank you for today's choice.",
+    "The craving will pass. Your strength will remain.",
+    "You're not alone in this journey.",
+    "Small steps lead to lasting sobriety.",
+    "Choose clarity over chaos. You can do this.",
+  ],
+};
 
 const Home = () => {
   const [quote, setQuote] = useState('');
+  const [addictionType, setAddictionType] = useState<'gambling' | 'alcohol'>('gambling');
+  const [appName, setAppName] = useState('Recovery App');
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
 
   useEffect(() => {
-    const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+    loadUserProfile();
+  }, [user]);
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('addiction_type')
+      .eq('user_id', user.id)
+      .single();
+
+    const type = (data?.addiction_type as 'gambling' | 'alcohol') || 'gambling';
+    setAddictionType(type);
+    setAppName(type === 'gambling' ? 'GambleCooler' : 'RecoveryCooler');
+    
+    const quotes = motivationalQuotes[type];
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
     setQuote(randomQuote);
-  }, []);
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -37,7 +69,7 @@ const Home = () => {
         {/* Header */}
         <div className="flex items-center justify-between gentle-fade-in">
           <div>
-            <h1 className="text-3xl font-bold">GambleCooler</h1>
+            <h1 className="text-3xl font-bold">{appName}</h1>
             <p className="text-sm text-muted-foreground">Welcome back, {user?.email?.split('@')[0]}</p>
           </div>
           <div className="flex gap-2">
@@ -85,7 +117,9 @@ const Home = () => {
             onClick={() => navigate('/spending')}
           >
             <DollarSign className="w-6 h-6 sm:w-8 sm:h-8" />
-            <span className="text-sm sm:text-base">Spending Tracker</span>
+            <span className="text-sm sm:text-base">
+              {addictionType === 'gambling' ? 'Gambling Tracker' : 'Alcohol Tracker'}
+            </span>
           </Button>
           <Button
             variant="outline"
@@ -94,7 +128,9 @@ const Home = () => {
             onClick={() => navigate('/exclusion')}
           >
             <Shield className="w-6 h-6 sm:w-8 sm:h-8" />
-            <span className="text-sm sm:text-base">Self-Exclusion</span>
+            <span className="text-sm sm:text-base">
+              {addictionType === 'gambling' ? 'Site Blocking' : 'Venue Blocking'}
+            </span>
           </Button>
         </div>
 

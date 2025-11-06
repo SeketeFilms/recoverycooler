@@ -1,68 +1,110 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { CountrySelector } from '@/components/CountrySelector';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, Heart, Shield, TrendingDown } from 'lucide-react';
-
-const slides = [
-  {
-    icon: Heart,
-    title: 'Welcome to GambleCooler',
-    description: 'A supportive space to help you manage urges, build healthy habits, and regain control of your life.',
-  },
-  {
-    icon: Shield,
-    title: 'Your Safe Space',
-    description: 'Set spending limits, block harmful sites, and access guided meditations whenever you need support.',
-  },
-  {
-    icon: TrendingDown,
-    title: 'Progress, Not Perfection',
-    description: 'Track your journey, celebrate wins, and remember: every step forward counts.',
-  },
-];
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { ChevronRight } from 'lucide-react';
 
 const Onboarding = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [fullName, setFullName] = useState('');
+  const [country, setCountry] = useState('US');
+  const [addictionType, setAddictionType] = useState<'gambling' | 'alcohol'>('gambling');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleNext = () => {
-    if (currentSlide < slides.length - 1) {
-      setCurrentSlide(currentSlide + 1);
-    } else {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
+      toast.error('Please sign in first');
       navigate('/auth');
+      return;
     }
+
+    setIsLoading(true);
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        full_name: fullName,
+        country: country,
+        addiction_type: addictionType,
+      })
+      .eq('user_id', user.id);
+
+    setIsLoading(false);
+
+    if (error) {
+      console.error('Profile update error:', error);
+      toast.error('Failed to save your information');
+      return;
+    }
+
+    toast.success('Welcome! Your profile has been created');
+    navigate('/home');
   };
 
-  const slide = slides[currentSlide];
-  const Icon = slide.icon;
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 via-background to-accent/20 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-background to-accent/20 p-6">
       <Card className="w-full max-w-md gentle-fade-in">
-        <CardContent className="pt-12 pb-8 space-y-8 text-center">
-          <div className="mx-auto w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center breathe-animation">
-            <Icon className="w-12 h-12 text-primary" />
-          </div>
-          <div className="space-y-3">
-            <h1 className="text-2xl font-bold">{slide.title}</h1>
-            <p className="text-muted-foreground leading-relaxed">{slide.description}</p>
-          </div>
-          <div className="flex gap-2 justify-center">
-            {slides.map((_, index) => (
-              <div
-                key={index}
-                className={`h-2 rounded-full transition-all ${
-                  index === currentSlide ? 'w-8 bg-primary' : 'w-2 bg-muted'
-                }`}
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">Complete Your Profile</CardTitle>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-6">
+            <div>
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Enter your name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="mt-2"
+                required
               />
-            ))}
-          </div>
-          <Button onClick={handleNext} size="lg" className="w-full">
-            {currentSlide === slides.length - 1 ? 'Get Started' : 'Continue'}
-            <ChevronRight className="ml-2 h-5 w-5" />
-          </Button>
-        </CardContent>
+            </div>
+            
+            <div>
+              <Label>Country</Label>
+              <CountrySelector value={country} onValueChange={setCountry} />
+            </div>
+
+            <div>
+              <Label className="text-base font-semibold">I'm seeking help with</Label>
+              <RadioGroup 
+                value={addictionType} 
+                onValueChange={(value) => setAddictionType(value as 'gambling' | 'alcohol')} 
+                className="mt-3 space-y-3"
+              >
+                <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
+                  <RadioGroupItem value="gambling" id="gambling" />
+                  <Label htmlFor="gambling" className="cursor-pointer flex-1 font-normal">
+                    🎲 Gambling Addiction
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
+                  <RadioGroupItem value="alcohol" id="alcohol" />
+                  <Label htmlFor="alcohol" className="cursor-pointer flex-1 font-normal">
+                    🍺 Alcohol Addiction
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Complete Setup'}
+              <ChevronRight className="ml-2 h-5 w-5" />
+            </Button>
+          </CardContent>
+        </form>
       </Card>
     </div>
   );
