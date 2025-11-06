@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { z } from 'zod';
+import { getCurrencySymbol } from '@/lib/currency';
 
 const spendingSchema = z.object({
   amount: z.number()
@@ -33,6 +34,7 @@ const Spending = () => {
   const [logAmount, setLogAmount] = useState<string>('');
   const [logNotes, setLogNotes] = useState<string>('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [currencySymbol, setCurrencySymbol] = useState<string>('$');
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -44,6 +46,17 @@ const Spending = () => {
 
   const loadData = async () => {
     if (!user) return;
+
+    // Load user profile to get country
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('country')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileData?.country) {
+      setCurrencySymbol(getCurrencySymbol(profileData.country));
+    }
 
     // Load daily limit
     const { data: limitData } = await supabase
@@ -135,7 +148,7 @@ const Spending = () => {
         description: 'Take a moment to breathe and reflect.',
       });
     } else {
-      toast.success(`Logged $${amount.toFixed(2)}`);
+      toast.success(`Logged ${currencySymbol}${amount.toFixed(2)}`);
     }
   };
 
@@ -161,9 +174,9 @@ const Spending = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center space-y-2">
-              <p className="text-4xl font-bold">${todaySpent.toFixed(2)}</p>
+              <p className="text-4xl font-bold">{currencySymbol}{todaySpent.toFixed(2)}</p>
               <p className="text-muted-foreground">
-                {dailyLimit > 0 ? `of $${dailyLimit.toFixed(2)} limit` : 'No limit set'}
+                {dailyLimit > 0 ? `of ${currencySymbol}${dailyLimit.toFixed(2)} limit` : 'No limit set'}
               </p>
             </div>
             {dailyLimit > 0 && (
@@ -198,7 +211,7 @@ const Spending = () => {
           <CardContent className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1">
-                <Label htmlFor="limit">New Daily Limit ($)</Label>
+                <Label htmlFor="limit">New Daily Limit ({currencySymbol})</Label>
                 <Input
                   id="limit"
                   type="number"
@@ -235,7 +248,7 @@ const Spending = () => {
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="amount">Amount ($)</Label>
+                <Label htmlFor="amount">Amount ({currencySymbol})</Label>
                 <Input
                   id="amount"
                   type="number"
