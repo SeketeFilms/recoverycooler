@@ -12,7 +12,6 @@ import Cooldown from "./pages/Cooldown";
 import Spending from "./pages/Spending";
 import Exclusion from "./pages/Exclusion";
 import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 
@@ -65,14 +64,6 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Settings />
                 </ProtectedRoute>
               }
             />

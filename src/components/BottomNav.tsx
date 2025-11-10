@@ -1,4 +1,4 @@
-import { Home, Clock, DollarSign, User, Settings } from 'lucide-react';
+import { Home, Clock, DollarSign, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -11,7 +11,6 @@ const BottomNav = () => {
     { icon: Clock, label: 'Cooldown', path: '/cooldown' },
     { icon: DollarSign, label: 'Spending', path: '/spending' },
     { icon: User, label: 'Profile', path: '/profile' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
   return (
