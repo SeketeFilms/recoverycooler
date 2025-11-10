@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, DollarSign, Shield, User, HelpCircle, LogOut } from 'lucide-react';
+import BottomNav from '@/components/BottomNav';
 
 const motivationalQuotes = {
   gambling: [
@@ -64,7 +65,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 pb-20">
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between gentle-fade-in">
@@ -144,6 +145,7 @@ const Home = () => {
           Profile & Settings
         </Button>
       </div>
+      <BottomNav />
     </div>
   );
 };

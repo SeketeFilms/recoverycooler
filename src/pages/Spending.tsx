@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, DollarSign, TrendingDown, Plus } from 'lucide-react';
+import { TrendingDown, Plus, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
+import BottomNav from '@/components/BottomNav';
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { z } from 'zod';
-import { getCurrencySymbol } from '@/lib/currency';
 
 const spendingSchema = z.object({
   amount: z.number()
@@ -34,8 +33,6 @@ const Spending = () => {
   const [logAmount, setLogAmount] = useState<string>('');
   const [logNotes, setLogNotes] = useState<string>('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [currencySymbol, setCurrencySymbol] = useState<string>('$');
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -46,17 +43,6 @@ const Spending = () => {
 
   const loadData = async () => {
     if (!user) return;
-
-    // Load user profile to get country
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('country')
-      .eq('user_id', user.id)
-      .single();
-
-    if (profileData?.country) {
-      setCurrencySymbol(getCurrencySymbol(profileData.country));
-    }
 
     // Load daily limit
     const { data: limitData } = await supabase
@@ -148,35 +134,35 @@ const Spending = () => {
         description: 'Take a moment to breathe and reflect.',
       });
     } else {
-      toast.success(`Logged ${currencySymbol}${amount.toFixed(2)}`);
+      toast.success(`Logged ${amount.toFixed(2)}`);
     }
   };
 
   const percentage = dailyLimit > 0 ? (todaySpent / dailyLimit) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 p-6">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex items-center gap-4 gentle-fade-in">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/home')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-2xl font-bold">Spending Tracker</h1>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 pb-20">
+      <div className="max-w-2xl mx-auto p-6 space-y-6">
+        <div className="gentle-fade-in">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Spending Tracker
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Track and manage your daily spending</p>
         </div>
 
         {/* Today's Progress */}
-        <Card className="gentle-fade-in">
+        <Card className="gentle-fade-in border-primary/20 shadow-lg shadow-primary/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-primary" />
+              <TrendingUp className="w-5 h-5 text-primary" />
               Today's Spending
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center space-y-2">
-              <p className="text-4xl font-bold">{currencySymbol}{todaySpent.toFixed(2)}</p>
+              <p className="text-5xl font-bold">{todaySpent.toFixed(2)}</p>
               <p className="text-muted-foreground">
-                {dailyLimit > 0 ? `of ${currencySymbol}${dailyLimit.toFixed(2)} limit` : 'No limit set'}
+                {dailyLimit > 0 ? `of ${dailyLimit.toFixed(2)} limit` : 'No limit set'}
               </p>
             </div>
             {dailyLimit > 0 && (
@@ -198,10 +184,10 @@ const Spending = () => {
         </Card>
 
         {/* Set Daily Limit */}
-        <Card>
+        <Card className="border-accent/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingDown className="w-5 h-5" />
+              <TrendingDown className="w-5 h-5 text-accent" />
               Daily Limit
             </CardTitle>
             <CardDescription>
@@ -211,7 +197,7 @@ const Spending = () => {
           <CardContent className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1">
-                <Label htmlFor="limit">New Daily Limit ({currencySymbol})</Label>
+                <Label htmlFor="limit">New Daily Limit</Label>
                 <Input
                   id="limit"
                   type="number"
@@ -220,11 +206,12 @@ const Spending = () => {
                   value={newLimit}
                   onChange={(e) => setNewLimit(e.target.value)}
                   placeholder="e.g. 50.00"
+                  className="text-lg"
                 />
               </div>
               <div className="flex items-end">
-                <Button onClick={handleSaveLimit} disabled={!newLimit}>
-                  Save Limit
+                <Button onClick={handleSaveLimit} disabled={!newLimit} className="h-10">
+                  Save
                 </Button>
               </div>
             </div>
@@ -234,7 +221,7 @@ const Spending = () => {
         {/* Log Spending */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="w-full">
+            <Button size="lg" className="w-full shadow-lg">
               <Plus className="mr-2 h-5 w-5" />
               Log Spending
             </Button>
@@ -248,7 +235,7 @@ const Spending = () => {
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="amount">Amount ({currencySymbol})</Label>
+                <Label htmlFor="amount">Amount</Label>
                 <Input
                   id="amount"
                   type="number"
@@ -257,6 +244,7 @@ const Spending = () => {
                   value={logAmount}
                   onChange={(e) => setLogAmount(e.target.value)}
                   placeholder="0.00"
+                  className="text-lg"
                 />
               </div>
               <div>
@@ -275,6 +263,7 @@ const Spending = () => {
           </DialogContent>
         </Dialog>
       </div>
+      <BottomNav />
     </div>
   );
 };

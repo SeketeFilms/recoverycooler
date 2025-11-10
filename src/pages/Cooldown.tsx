@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import BottomNav from '@/components/BottomNav';
 
 const breathingSteps = [
   "Take a slow, deep breath in through your nose for 4 counts...",
@@ -112,13 +113,13 @@ const Cooldown = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-accent/20 p-6">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex items-center gap-4 gentle-fade-in">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/home')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-2xl font-bold">Guided Cooldown</h1>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 pb-20">
+      <div className="max-w-2xl mx-auto p-6 space-y-6">
+        <div className="gentle-fade-in">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Guided Cooldown
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Take a moment to breathe and relax</p>
         </div>
 
         <Tabs value={selectedMode} onValueChange={(v) => {
@@ -416,6 +417,7 @@ const Cooldown = () => {
           </CardContent>
         </Card>
       </div>
+      <BottomNav />
     </div>
   );
 };

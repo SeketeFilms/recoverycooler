@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, User, LogOut, Save } from 'lucide-react';
+import { User, LogOut, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
+import BottomNav from '@/components/BottomNav';
 
 const profileSchema = z.object({
   fullName: z.string().trim().max(100, 'Name too long'),
@@ -95,13 +96,13 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 p-6">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex items-center gap-4 gentle-fade-in">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/home')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-2xl font-bold">Profile & Settings</h1>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 pb-20">
+      <div className="max-w-2xl mx-auto p-6 space-y-6">
+        <div className="gentle-fade-in">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Profile & Settings
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage your account information</p>
         </div>
 
         <Card className="gentle-fade-in">
@@ -188,6 +189,7 @@ const Profile = () => {
           Sign Out
         </Button>
       </div>
+      <BottomNav />
     </div>
   );
 };
