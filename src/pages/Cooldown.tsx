@@ -200,15 +200,14 @@ const Cooldown = () => {
                 {meditationTracks.map((track, index) => (
                   <div key={index} className="space-y-3">
                     <h3 className="font-medium text-base">{track.name}</h3>
-                    <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                    <div className="relative w-full rounded-lg overflow-hidden bg-black" style={{ paddingBottom: '56.25%' }}>
                       <iframe
-                        className="absolute top-0 left-0 w-full h-full rounded-lg"
-                        src={`https://www.youtube.com/embed/${track.videoId}`}
+                        className="absolute top-0 left-0 w-full h-full"
+                        src={`https://www.youtube.com/embed/${track.videoId}?enablejsapi=1&rel=0`}
                         title={track.name}
-                        frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
-                        style={{ border: 0 }}
+                        loading="lazy"
                       />
                     </div>
                   </div>
