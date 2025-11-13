@@ -21,17 +21,21 @@ const breathingSteps = [
 ];
 
 const meditationTracks = [
-  { name: 'Ocean Waves', duration: 600, description: 'Calming ocean sounds' },
-  { name: 'Forest Rain', duration: 600, description: 'Peaceful rainfall in nature' },
-  { name: 'Gentle Piano', duration: 600, description: 'Soft piano melodies' },
-  { name: 'Tibetan Bowls', duration: 600, description: 'Healing sound bath' },
+  { name: 'Night Water Flow 1', videoId: 'I9lq8gIp5es' },
+  { name: 'Night Water Flow 2', videoId: 'X3TabauC0uk' },
+  { name: 'Night Water Flow 3', videoId: 'JUDmFnqbrb8' },
+  { name: 'Power Water Meditation 1', videoId: '81O5_-sFWGw' },
+  { name: 'Power Water Meditation 2', videoId: 'QBl5rd-EJB4' },
+  { name: 'Power Water Meditation 3', videoId: 'mzSeBjLGqu4' },
+  { name: 'Rain & Calm Energy 1', videoId: 'M2zYCg4ExMs' },
+  { name: 'Rain & Calm Energy 2', videoId: '8reUL35jWUU' },
+  { name: 'Rain & Calm Energy 3', videoId: 'zGjLmtH38o0' },
 ];
 
 const Cooldown = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedMode, setSelectedMode] = useState<'breathing' | 'meditation' | 'timed'>('breathing');
-  const [selectedTrack, setSelectedTrack] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
@@ -60,9 +64,9 @@ const Cooldown = () => {
     return () => clearInterval(interval);
   }, [isPlaying, elapsedTime, selectedMode]);
 
-  // Setup audio element for meditation sounds
+  // Setup audio element for timed session
   useEffect(() => {
-    if (selectedMode === 'meditation' || selectedMode === 'timed') {
+    if (selectedMode === 'timed') {
       // In production, replace these with actual audio file URLs
       // For now, using Web Audio API to generate placeholder sounds
       const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
@@ -74,7 +78,7 @@ const Cooldown = () => {
         const gainNode = audioContext.createGain();
         
         oscillator.type = 'sine';
-        oscillator.frequency.value = 200 + (selectedTrack * 50); // Different frequency per track
+        oscillator.frequency.value = 200;
         gainNode.gain.value = volume * 0.1; // Very low volume for ambient
         
         oscillator.connect(gainNode);
@@ -87,7 +91,7 @@ const Cooldown = () => {
         };
       }
     }
-  }, [isPlaying, selectedMode, selectedTrack, volume, isMuted]);
+  }, [isPlaying, selectedMode, volume, isMuted]);
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
@@ -192,77 +196,23 @@ const Cooldown = () => {
               <CardHeader>
                 <CardTitle>Choose Your Meditation</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="grid grid-cols-1 gap-4">
                 {meditationTracks.map((track, index) => (
-                  <Button
-                    key={index}
-                    variant={selectedTrack === index ? 'default' : 'outline'}
-                    className="w-full justify-start text-left"
-                    onClick={() => {
-                      setSelectedTrack(index);
-                      setIsPlaying(false);
-                      setElapsedTime(0);
-                    }}
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium">{track.name}</p>
-                      <p className="text-xs opacity-70">{track.description}</p>
+                  <div key={index} className="space-y-2">
+                    <h3 className="font-medium text-sm">{track.name}</h3>
+                    <div className="aspect-video rounded-lg overflow-hidden">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        src={`https://www.youtube.com/embed/${track.videoId}`}
+                        title={track.name}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
                     </div>
-                  </Button>
+                  </div>
                 ))}
-              </CardContent>
-            </Card>
-
-            {/* Visualization */}
-            <div className="flex justify-center py-6 sm:py-8">
-              <div className={`w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-gradient-to-br from-accent to-accent/40 flex items-center justify-center transition-all duration-1000 ${isPlaying ? 'wave-pulse' : ''}`}>
-                <div className="text-center text-foreground px-4">
-                  <p className="text-xs sm:text-sm font-medium">{meditationTracks[selectedTrack].name}</p>
-                  <p className="text-2xl sm:text-3xl font-bold mt-2">{formatTime(elapsedTime)}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Audio Controls */}
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsMuted(!isMuted)}
-                  >
-                    {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                  </Button>
-                  <Slider
-                    value={[volume * 100]}
-                    onValueChange={(v) => setVolume(v[0] / 100)}
-                    max={100}
-                    step={1}
-                    className="flex-1"
-                    disabled={isMuted}
-                  />
-                </div>
-                
-                <div className="flex gap-4">
-                  <Button size="lg" className="flex-1" onClick={togglePlay}>
-                    {isPlaying ? (
-                      <>
-                        <Pause className="mr-2 h-5 w-5" />
-                        Pause
-                      </>
-                    ) : (
-                      <>
-                        <Play className="mr-2 h-5 w-5" />
-                        Play
-                      </>
-                    )}
-                  </Button>
-                  <Button variant="outline" size="lg" onClick={resetExercise}>
-                    <RotateCcw className="mr-2 h-4 w-4" />
-                    Reset
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>

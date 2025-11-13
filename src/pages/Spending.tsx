@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { z } from 'zod';
+import { getCurrencySymbol } from '@/lib/currency';
 
 const spendingSchema = z.object({
   amount: z.number()
@@ -33,6 +34,7 @@ const Spending = () => {
   const [logAmount, setLogAmount] = useState<string>('');
   const [logNotes, setLogNotes] = useState<string>('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [currencySymbol, setCurrencySymbol] = useState('$');
   const { user } = useAuth();
 
   useEffect(() => {
@@ -43,6 +45,17 @@ const Spending = () => {
 
   const loadData = async () => {
     if (!user) return;
+
+    // Load user's country for currency
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('country')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileData?.country) {
+      setCurrencySymbol(getCurrencySymbol(profileData.country));
+    }
 
     // Load daily limit
     const { data: limitData } = await supabase
@@ -134,7 +147,7 @@ const Spending = () => {
         description: 'Take a moment to breathe and reflect.',
       });
     } else {
-      toast.success(`Logged ${amount.toFixed(2)}`);
+      toast.success(`Logged ${currencySymbol}${amount.toFixed(2)}`);
     }
   };
 
@@ -160,9 +173,9 @@ const Spending = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center space-y-2">
-              <p className="text-5xl font-bold">{todaySpent.toFixed(2)}</p>
+              <p className="text-5xl font-bold">{currencySymbol}{todaySpent.toFixed(2)}</p>
               <p className="text-muted-foreground">
-                {dailyLimit > 0 ? `of ${dailyLimit.toFixed(2)} limit` : 'No limit set'}
+                {dailyLimit > 0 ? `of ${currencySymbol}${dailyLimit.toFixed(2)} limit` : 'No limit set'}
               </p>
             </div>
             {dailyLimit > 0 && (
@@ -205,7 +218,7 @@ const Spending = () => {
                   step="0.01"
                   value={newLimit}
                   onChange={(e) => setNewLimit(e.target.value)}
-                  placeholder="e.g. 50.00"
+                  placeholder={`e.g. ${currencySymbol}50.00`}
                   className="text-lg"
                 />
               </div>
@@ -243,7 +256,7 @@ const Spending = () => {
                   step="0.01"
                   value={logAmount}
                   onChange={(e) => setLogAmount(e.target.value)}
-                  placeholder="0.00"
+                  placeholder={`e.g. ${currencySymbol}25.00`}
                   className="text-lg"
                 />
               </div>
