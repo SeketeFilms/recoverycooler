@@ -196,19 +196,19 @@ const Cooldown = () => {
               <CardHeader>
                 <CardTitle>Choose Your Meditation</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-4">
+              <CardContent className="grid grid-cols-1 gap-6">
                 {meditationTracks.map((track, index) => (
-                  <div key={index} className="space-y-2">
-                    <h3 className="font-medium text-sm">{track.name}</h3>
-                    <div className="aspect-video rounded-lg overflow-hidden">
+                  <div key={index} className="space-y-3">
+                    <h3 className="font-medium text-base">{track.name}</h3>
+                    <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                       <iframe
-                        width="100%"
-                        height="100%"
+                        className="absolute top-0 left-0 w-full h-full rounded-lg"
                         src={`https://www.youtube.com/embed/${track.videoId}`}
                         title={track.name}
                         frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
+                        style={{ border: 0 }}
                       />
                     </div>
                   </div>
