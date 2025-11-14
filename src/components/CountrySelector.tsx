@@ -20,9 +20,10 @@ import { countries } from '@/lib/countries';
 interface CountrySelectorProps {
   value: string;
   onValueChange: (value: string) => void;
+  disabled?: boolean;
 }
 
-export function CountrySelector({ value, onValueChange }: CountrySelectorProps) {
+export function CountrySelector({ value, onValueChange, disabled = false }: CountrySelectorProps) {
   const [open, setOpen] = useState(false);
 
   const selectedCountry = countries.find((country) => country.code === value);
@@ -35,6 +36,7 @@ export function CountrySelector({ value, onValueChange }: CountrySelectorProps) 
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between"
+          disabled={disabled}
         >
           {selectedCountry ? selectedCountry.name : 'Select country...'}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

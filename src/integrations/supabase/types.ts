@@ -17,6 +17,7 @@ export type Database = {
       profiles: {
         Row: {
           addiction_type: string
+          avatar_url: string | null
           country: string | null
           created_at: string
           full_name: string | null
@@ -28,6 +29,7 @@ export type Database = {
         }
         Insert: {
           addiction_type?: string
+          avatar_url?: string | null
           country?: string | null
           created_at?: string
           full_name?: string | null
@@ -39,6 +41,7 @@ export type Database = {
         }
         Update: {
           addiction_type?: string
+          avatar_url?: string | null
           country?: string | null
           created_at?: string
           full_name?: string | null

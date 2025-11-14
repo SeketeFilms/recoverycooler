@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { User, LogOut, Save, Moon, Sun } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { User, LogOut, Save, Moon, Sun, Edit, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
@@ -26,7 +27,11 @@ const Profile = () => {
   const [username, setUsername] = useState('');
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('US');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
@@ -51,6 +56,57 @@ const Profile = () => {
       setUsername(data.username || '');
       setGender(data.gender || '');
       setCountry(data.country || 'US');
+      setAvatarUrl(data.avatar_url || '');
+    }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user || !event.target.files || event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${user.id}/avatar.${fileExt}`;
+
+    setUploading(true);
+
+    try {
+      // Delete old avatar if exists
+      if (avatarUrl) {
+        const oldPath = avatarUrl.split('/').slice(-2).join('/');
+        await supabase.storage.from('avatars').remove([oldPath]);
+      }
+
+      // Upload new avatar
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+      toast.success('Profile picture updated!');
+    } catch (error) {
+      toast.error('Failed to upload profile picture');
+      console.error(error);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -90,6 +146,7 @@ const Profile = () => {
       return;
     }
 
+    setIsEditing(false);
     toast.success('Profile updated!');
   };
 
@@ -110,9 +167,42 @@ const Profile = () => {
 
         <Card className="gentle-fade-in">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5 text-primary" />
-              Your Information
+            <div className="flex items-center justify-center mb-4">
+              <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={avatarUrl} alt={fullName || 'Profile'} />
+                  <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                    {fullName ? fullName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-8 h-8 text-white" />
+                </div>
+                {uploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
+            </div>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <User className="w-5 h-5 text-primary" />
+                Your Information
+              </div>
+              {!isEditing && (
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
+                </Button>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -127,6 +217,7 @@ const Profile = () => {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Your name"
+                disabled={!isEditing}
               />
             </div>
             <div className="space-y-2">
@@ -136,6 +227,7 @@ const Profile = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Your username"
+                disabled={!isEditing}
               />
             </div>
             <div className="space-y-2">
@@ -145,16 +237,32 @@ const Profile = () => {
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 placeholder="Your gender"
+                disabled={!isEditing}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
-              <CountrySelector value={country} onValueChange={setCountry} />
+              <CountrySelector value={country} onValueChange={setCountry} disabled={!isEditing} />
             </div>
-            <Button onClick={handleSaveProfile} disabled={loading} className="w-full">
-              <Save className="mr-2 h-4 w-4" />
-              Save Changes
-            </Button>
+            {isEditing && (
+              <div className="flex gap-2">
+                <Button onClick={handleSaveProfile} disabled={loading} className="flex-1">
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Changes
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsEditing(false);
+                    loadProfile();
+                  }}
+                  disabled={loading}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
