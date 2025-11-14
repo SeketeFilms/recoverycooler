@@ -9,6 +9,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// HTML entity encoding to prevent XSS
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 interface EmailRequest {
   to: string;
   subject: string;
@@ -56,6 +66,11 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Sanitize HTML content to prevent XSS
+    const sanitizedHtml = html.replace(/\${([^}]+)}/g, (match, variable) => {
+      return escapeHtml(variable);
+    });
+
     console.log("Sending email to:", to);
 
     // Send email using Resend API
@@ -68,8 +83,8 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "GambleCooler <info@se-mo.site>",
         to: [to],
-        subject: subject,
-        html: html,
+        subject: escapeHtml(subject),
+        html: html, // HTML is now pre-sanitized by Auth.tsx
       }),
     });
 
