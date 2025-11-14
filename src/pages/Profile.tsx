@@ -8,7 +8,18 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { User, LogOut, Save, Moon, Sun, Edit, Camera } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { User, LogOut, Save, Moon, Sun, Edit, Camera, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
@@ -31,6 +42,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -153,6 +165,48 @@ const Profile = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate('/auth');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    
+    setDeleting(true);
+
+    try {
+      // Delete user's profile data
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (profileError) {
+        console.error('Profile deletion error:', profileError);
+      }
+
+      // Delete user's avatar if exists
+      if (avatarUrl) {
+        const oldPath = avatarUrl.split('/').slice(-2).join('/');
+        await supabase.storage.from('avatars').remove([oldPath]);
+      }
+
+      // Delete spending logs
+      await supabase.from('spending_logs').delete().eq('user_id', user.id);
+      
+      // Delete spending limits
+      await supabase.from('spending_limits').delete().eq('user_id', user.id);
+      
+      // Delete self-exclusion domains
+      await supabase.from('self_exclusion_domains').delete().eq('user_id', user.id);
+
+      // Sign out and redirect
+      await signOut();
+      toast.success('Account deleted successfully');
+      navigate('/auth');
+    } catch (error) {
+      console.error('Account deletion error:', error);
+      toast.error('Failed to delete account');
+      setDeleting(false);
+    }
   };
 
   return (
@@ -322,10 +376,46 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        <Button variant="destructive" className="w-full" onClick={handleSignOut}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
-        </Button>
+        <div className="space-y-2">
+          <Button variant="destructive" className="w-full" onClick={handleSignOut}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign Out
+          </Button>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Account
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your account
+                  and remove all your data from our servers, including:
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                    <li>Your profile information</li>
+                    <li>Spending logs and limits</li>
+                    <li>Self-exclusion list</li>
+                    <li>All other personal data</li>
+                  </ul>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deleting ? 'Deleting...' : 'Delete Account'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
       <BottomNav />
     </div>
