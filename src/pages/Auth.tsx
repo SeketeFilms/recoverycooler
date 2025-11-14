@@ -10,6 +10,16 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
 
+// HTML entity encoding to prevent XSS in emails
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 const authSchema = z.object({
   email: z.string().trim().email('Invalid email address').max(255, 'Email too long'),
   password: z.string()
@@ -17,7 +27,12 @@ const authSchema = z.object({
     .regex(/[A-Z]/, 'Password must contain an uppercase letter')
     .regex(/[a-z]/, 'Password must contain a lowercase letter')
     .regex(/[0-9]/, 'Password must contain a number'),
-  fullName: z.string().trim().min(1, 'Name is required').max(100, 'Name too long').optional(),
+  fullName: z.string()
+    .trim()
+    .min(1, 'Name is required')
+    .max(100, 'Name too long')
+    .regex(/^[a-zA-Z\s'-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes')
+    .optional(),
   username: z.string().trim().min(3, 'Username must be at least 3 characters').max(50, 'Username too long').optional(),
   gender: z.string().trim().max(50, 'Gender too long').optional(),
 });
@@ -76,7 +91,7 @@ const Auth = () => {
                   </div>
                   
                   <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 30px; border-radius: 12px; margin-bottom: 30px;">
-                    <h2 style="color: #1e40af; margin-top: 0;">Welcome, ${fullName}!</h2>
+                    <h2 style="color: #1e40af; margin-top: 0;">Welcome, ${escapeHtml(fullName)}!</h2>
                     <p style="color: #334155; line-height: 1.6; font-size: 16px;">
                       We're honored that you've chosen to take this brave step with GambleCooler. Recovery is not about perfection—it's about progress, one mindful moment at a time.
                     </p>
