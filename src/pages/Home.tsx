@@ -52,7 +52,7 @@ const Home = () => {
 
     const type = (data?.addiction_type as 'gambling' | 'alcohol') || 'gambling';
     setAddictionType(type);
-    setAppName(type === 'gambling' ? 'GambleCooler' : 'RecoveryCooler');
+    setAppName('Recovery Cooler');
     
     const quotes = motivationalQuotes[type];
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
@@ -66,41 +66,41 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 pb-20">
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between gentle-fade-in">
           <div>
-            <h1 className="text-3xl font-bold">{appName}</h1>
-            <p className="text-sm text-muted-foreground">Welcome back, {user?.email?.split('@')[0]}</p>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{appName}</h1>
+            <p className="text-sm text-muted-foreground mt-1">Welcome back, {user?.email?.split('@')[0]}</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/help')}>
+          <div className="flex gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/help')} className="rounded-full hover:scale-110 transition-transform">
               <HelpCircle className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={handleSignOut}>
+            <Button variant="ghost" size="icon" onClick={handleSignOut} className="rounded-full hover:scale-110 transition-transform">
               <LogOut className="h-5 w-5" />
             </Button>
           </div>
         </div>
 
         {/* Daily Motivation */}
-        <Card className="gentle-fade-in bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+        <Card className="gentle-fade-in bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 border-primary/20 shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Sparkles className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Sparkles className="w-6 h-6 text-primary" />
               Daily Motivation
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-medium italic">{quote}</p>
+            <p className="text-lg font-medium italic leading-relaxed">{quote}</p>
           </CardContent>
         </Card>
 
         {/* Emergency Cooldown Button */}
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-12">
           <button
             onClick={() => navigate('/cooldown')}
-            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 breathe-animation"
+            className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-full bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground shadow-2xl hover:shadow-[0_20px_60px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-105 breathe-animation"
           >
             <div className="text-center space-y-2 px-4">
               <p className="text-xl sm:text-2xl font-bold">I NEED HELP</p>

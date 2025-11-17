@@ -14,9 +14,9 @@ const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border/50 shadow-lg z-50">
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="flex items-center justify-around h-16">
+    <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl z-50">
+      <div className="max-w-2xl mx-auto px-6">
+        <div className="flex items-center justify-around h-20">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -26,14 +26,14 @@ const BottomNav = () => {
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all duration-200",
+                  "flex flex-col items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl transition-all duration-300",
                   isActive 
-                    ? "text-primary scale-105" 
-                    : "text-muted-foreground hover:text-foreground hover:scale-105"
+                    ? "text-primary scale-110 bg-primary/10" 
+                    : "text-muted-foreground hover:text-foreground hover:scale-105 hover:bg-muted/50"
                 )}
               >
-                <Icon className={cn("h-5 w-5", isActive && "drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]")} />
-                <span className="text-xs font-medium">{item.label}</span>
+                <Icon className={cn("h-6 w-6", isActive && "drop-shadow-[0_0_10px_hsl(var(--primary)/0.6)]")} />
+                <span className="text-xs font-semibold">{item.label}</span>
               </button>
             );
           })}

@@ -206,26 +206,26 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 pb-20">
-      <div className="max-w-2xl mx-auto p-6 space-y-6">
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
         <div className="gentle-fade-in">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Profile & Settings
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">Manage your account information</p>
+          <p className="text-base text-muted-foreground mt-2">Manage your account information</p>
         </div>
 
-        <Card className="gentle-fade-in">
+        <Card className="gentle-fade-in shadow-xl bg-gradient-to-br from-card to-primary/5 border-primary/10">
           <CardHeader>
-            <div className="flex items-center justify-center mb-4">
+            <div className="flex items-center justify-center mb-6">
               <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
-                <Avatar className="h-24 w-24">
+                <Avatar className="h-36 w-36 ring-4 ring-primary/10 transition-all hover:ring-primary/30">
                   <AvatarImage src={avatarUrl} alt={fullName || 'Profile'} />
-                  <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                  <AvatarFallback className="text-4xl bg-gradient-to-br from-primary to-accent text-white">
                     {fullName ? fullName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-8 h-8 text-white" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-10 h-10 text-white" />
                 </div>
                 {uploading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
