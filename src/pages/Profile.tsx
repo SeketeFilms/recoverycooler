@@ -173,34 +173,29 @@ const Profile = () => {
     setDeleting(true);
 
     try {
-      // Delete user's profile data
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (profileError) {
-        console.error('Profile deletion error:', profileError);
+      // Get current session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("No active session");
       }
 
-      // Delete user's avatar if exists
-      if (avatarUrl) {
-        const oldPath = avatarUrl.split('/').slice(-2).join('/');
-        await supabase.storage.from('avatars').remove([oldPath]);
+      // Call edge function to delete account completely (including auth.users)
+      const { error } = await supabase.functions.invoke('delete-account', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error deleting account:', error);
+        throw error;
       }
 
-      // Delete spending logs
-      await supabase.from('spending_logs').delete().eq('user_id', user.id);
+      toast.success('Account deleted successfully');
       
-      // Delete spending limits
-      await supabase.from('spending_limits').delete().eq('user_id', user.id);
-      
-      // Delete self-exclusion domains
-      await supabase.from('self_exclusion_domains').delete().eq('user_id', user.id);
-
       // Sign out and redirect
       await signOut();
-      toast.success('Account deleted successfully');
       navigate('/auth');
     } catch (error) {
       console.error('Account deletion error:', error);
