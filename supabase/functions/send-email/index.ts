@@ -56,6 +56,32 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Rate limiting: Check recent email sends (5 per hour)
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { data: recentEmails, error: rateLimitError } = await supabase
+      .from('email_rate_limits')
+      .select('id')
+      .eq('user_id', user.id)
+      .gte('created_at', oneHourAgo);
+
+    if (rateLimitError) {
+      console.error("Rate limit check error:", rateLimitError);
+      return new Response(
+        JSON.stringify({ error: "Failed to check rate limit" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (recentEmails && recentEmails.length >= 5) {
+      console.log(`Rate limit exceeded for user ${user.id}: ${recentEmails.length} emails in last hour`);
+      return new Response(
+        JSON.stringify({ 
+          error: "Rate limit exceeded. You can send up to 5 emails per hour. Please try again later." 
+        }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const { to, subject, html }: EmailRequest = await req.json();
 
     // Validate that the user can only send email to their own email
@@ -65,11 +91,6 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
-
-    // Sanitize HTML content to prevent XSS
-    const sanitizedHtml = html.replace(/\${([^}]+)}/g, (match, variable) => {
-      return escapeHtml(variable);
-    });
 
     console.log("Sending email to:", to);
 
@@ -93,6 +114,16 @@ const handler = async (req: Request): Promise<Response> => {
     if (!response.ok) {
       console.error("Resend API error:", emailResponse);
       throw new Error(emailResponse.message || "Failed to send email");
+    }
+
+    // Log successful email send for rate limiting
+    const { error: logError } = await supabase
+      .from('email_rate_limits')
+      .insert({ user_id: user.id });
+
+    if (logError) {
+      console.error("Failed to log email send:", logError);
+      // Don't fail the request if logging fails
     }
 
     console.log("Email sent successfully:", emailResponse);
