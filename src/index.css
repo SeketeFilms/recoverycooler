@@ -40,7 +40,7 @@ All colors MUST be HSL.
     --input: 180 20% 90%;
     --ring: 174 72% 41%;
 
-    --radius: 1rem;
+    --radius: 1.5rem;
 
     /* Calm gradient colors */
     --gradient-start: 174 72% 41%;
