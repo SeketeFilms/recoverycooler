@@ -44,19 +44,35 @@ const Cooldown = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<typeof meditationTracks[0] | null>(null);
   const playerRef = useRef<any>(null);
+  const breathingPlayerRef = useRef<any>(null);
   const navigate = useNavigate();
   const isOnline = useOnlineStatus();
 
-  // Breathing exercise timer
+  // Initialize YouTube player for breathing video
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying && selectedMode === 'breathing' && currentStep < breathingSteps.length - 1) {
-      interval = setInterval(() => {
-        setCurrentStep((prev) => Math.min(prev + 1, breathingSteps.length - 1));
-      }, 6000);
+    if (selectedMode === 'breathing' && isOnline) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      if (firstScriptTag.parentNode && !document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      }
+
+      (window as any).onYouTubeIframeAPIReady = () => {
+        if (!breathingPlayerRef.current) {
+          breathingPlayerRef.current = new (window as any).YT.Player('breathing-player', {
+            videoId: 'uXcUYS9W0Oc',
+            playerVars: {
+              autoplay: 0,
+              controls: 1,
+              modestbranding: 1,
+              rel: 0,
+            },
+          });
+        }
+      };
     }
-    return () => clearInterval(interval);
-  }, [isPlaying, currentStep, selectedMode]);
+  }, [selectedMode, isOnline]);
 
   // Select random track when entering timed mode
   useEffect(() => {
@@ -132,6 +148,19 @@ const Cooldown = () => {
   }, [volume, isMuted, selectedMode]);
 
   const togglePlay = () => {
+    if (selectedMode === 'breathing' && breathingPlayerRef.current) {
+      if (isPlaying) {
+        breathingPlayerRef.current.pauseVideo();
+      } else {
+        breathingPlayerRef.current.playVideo();
+      }
+    } else if (selectedMode === 'timed' && playerRef.current) {
+      if (isPlaying) {
+        playerRef.current.pauseVideo();
+      } else {
+        playerRef.current.playVideo();
+      }
+    }
     setIsPlaying(!isPlaying);
   };
 
@@ -139,7 +168,10 @@ const Cooldown = () => {
     setCurrentStep(0);
     setElapsedTime(0);
     setIsPlaying(false);
-    if (playerRef.current && selectedMode === 'timed') {
+    if (selectedMode === 'breathing' && breathingPlayerRef.current) {
+      breathingPlayerRef.current.seekTo(0);
+      breathingPlayerRef.current.pauseVideo();
+    } else if (playerRef.current && selectedMode === 'timed') {
       playerRef.current.seekTo?.(0);
       playerRef.current.pauseVideo?.();
     }
@@ -156,9 +188,6 @@ const Cooldown = () => {
   };
 
   const getProgressPercent = () => {
-    if (selectedMode === 'breathing') {
-      return ((currentStep + 1) / breathingSteps.length) * 100;
-    }
     return (elapsedTime / 600) * 100;
   };
 
@@ -184,56 +213,52 @@ const Cooldown = () => {
 
           {/* Breathing Exercise Tab */}
           <TabsContent value="breathing" className="space-y-6">
-            {/* Breathing Circle */}
-            <div className="flex justify-center py-8 sm:py-12">
-              <div className={`w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-medium transition-all duration-1000 ${isPlaying ? 'breathe-animation' : ''}`}>
-                <p className="text-base sm:text-lg">Breathe</p>
-              </div>
-            </div>
-
-            {/* Current Step */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-center text-lg">
-                  Step {currentStep + 1} of {breathingSteps.length}
+            {!isOnline && (
+              <Alert className="bg-yellow-500/10 border-yellow-500/30">
+                <WifiOff className="h-4 w-4" />
+                <AlertDescription>
+                  Internet connection required for guided meditation video.
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl font-bold">
+                  Addiction Meditation
                 </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Guided meditation for addiction recovery
+                </p>
               </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-xl leading-relaxed">{breathingSteps[currentStep]}</p>
+              <CardContent className="space-y-4">
+                {/* Video Player */}
+                <div className="relative w-full rounded-lg overflow-hidden bg-black" style={{ paddingBottom: '56.25%' }}>
+                  <div id="breathing-player" className="absolute top-0 left-0 w-full h-full" />
+                </div>
+
+                {/* Controls */}
+                <div className="flex gap-4">
+                  <Button size="lg" className="flex-1" onClick={togglePlay} disabled={!isOnline}>
+                    {isPlaying ? (
+                      <>
+                        <Pause className="mr-2 h-5 w-5" />
+                        Pause
+                      </>
+                    ) : (
+                      <>
+                        <Play className="mr-2 h-5 w-5" />
+                        Play
+                      </>
+                    )}
+                  </Button>
+                  <Button variant="outline" size="lg" onClick={resetExercise} disabled={!isOnline}>
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Restart
+                  </Button>
+                </div>
               </CardContent>
             </Card>
-
-            {/* Controls */}
-            <div className="flex gap-4">
-              <Button size="lg" className="flex-1" onClick={togglePlay}>
-                {isPlaying ? (
-                  <>
-                    <Pause className="mr-2 h-5 w-5" />
-                    Pause
-                  </>
-                ) : (
-                  <>
-                    <Play className="mr-2 h-5 w-5" />
-                    {currentStep === 0 ? 'Start' : 'Resume'}
-                  </>
-                )}
-              </Button>
-              <Button variant="outline" size="lg" onClick={resetExercise}>
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Reset
-              </Button>
-            </div>
-
-            {currentStep === breathingSteps.length - 1 && (
-              <Card className="bg-primary/10 border-primary/20">
-                <CardContent className="pt-6 text-center space-y-4">
-                  <p className="font-medium">You did it! Well done for taking this time for yourself.</p>
-                  <Button onClick={() => navigate('/home')} className="w-full">
-                    Return Home
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
           </TabsContent>
 
           {/* Meditation Soundtracks Tab */}
