@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ExternalLink, Phone, MessageSquare, Globe } from 'lucide-react';
 import { countries } from '@/lib/countries';
 import { countryResources, DEFAULT_RESOURCES } from '@/lib/helpResources';
+import ShareJourney from '@/components/ShareJourney';
 import {
   Accordion,
   AccordionContent,
@@ -187,6 +188,9 @@ const Help = () => {
           </CardContent>
         </Card>
 
+        {/* Share Journey */}
+        <ShareJourney />
+
         {/* Terms */}
         <Card>
           <CardHeader>
@@ -205,6 +209,9 @@ const Help = () => {
             <p className="text-sm text-muted-foreground mt-2">
               Use this app responsibly and in conjunction with professional support when needed.
               Recovery is possible, and you deserve support every step of the way.
+            </p>
+            <p className="text-sm text-muted-foreground mt-4 pt-4 border-t border-border text-center font-medium">
+              App by Sekete Films Production/Se-Mo Group
             </p>
           </CardContent>
         </Card>
