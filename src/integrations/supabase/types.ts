@@ -32,6 +32,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          checkin_time: string | null
+          created_at: string
+          id: string
+          meditation_reminders: boolean | null
+          meditation_time: string | null
+          recovery_checkins: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checkin_time?: string | null
+          created_at?: string
+          id?: string
+          meditation_reminders?: boolean | null
+          meditation_time?: string | null
+          recovery_checkins?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checkin_time?: string | null
+          created_at?: string
+          id?: string
+          meditation_reminders?: boolean | null
+          meditation_time?: string | null
+          recovery_checkins?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           addiction_type: string
@@ -68,6 +101,33 @@ export type Database = {
           updated_at?: string
           user_id?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
         }
         Relationships: []
       }
