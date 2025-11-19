@@ -39,7 +39,6 @@ const Cooldown = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedMode, setSelectedMode] = useState<'breathing' | 'meditation' | 'timed'>('breathing');
-  const breathingPlayerRef = useRef<any>(null);
   const navigate = useNavigate();
   const isOnline = useOnlineStatus();
 
@@ -54,50 +53,13 @@ const Cooldown = () => {
     return () => clearInterval(interval);
   }, [isPlaying, currentStep, selectedMode]);
 
-  // Load YouTube IFrame API for timed session
-  useEffect(() => {
-    if (selectedMode === 'timed' && isOnline) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      if (firstScriptTag.parentNode && !document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      }
-
-      (window as any).onYouTubeIframeAPIReady = () => {
-        if (!breathingPlayerRef.current) {
-          breathingPlayerRef.current = new (window as any).YT.Player('session-player', {
-            videoId: 'uXcUYS9W0Oc',
-            playerVars: {
-              autoplay: 0,
-              controls: 1,
-              modestbranding: 1,
-              rel: 0,
-            },
-          });
-        }
-      };
-    }
-  }, [selectedMode, isOnline]);
-
   const togglePlay = () => {
-    if (selectedMode === 'timed' && breathingPlayerRef.current) {
-      if (isPlaying) {
-        breathingPlayerRef.current.pauseVideo();
-      } else {
-        breathingPlayerRef.current.playVideo();
-      }
-    }
     setIsPlaying(!isPlaying);
   };
 
   const resetExercise = () => {
     setCurrentStep(0);
     setIsPlaying(false);
-    if (selectedMode === 'timed' && breathingPlayerRef.current) {
-      breathingPlayerRef.current.seekTo(0);
-      breathingPlayerRef.current.pauseVideo();
-    }
   };
 
   return (
@@ -229,31 +191,16 @@ const Cooldown = () => {
                   Addiction meditation for recovery
                 </p>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Video Player */}
+              <CardContent>
                 <div className="relative w-full rounded-lg overflow-hidden bg-black" style={{ paddingBottom: '56.25%' }}>
-                  <div id="session-player" className="absolute top-0 left-0 w-full h-full" />
-                </div>
-
-                {/* Controls */}
-                <div className="flex gap-4">
-                  <Button size="lg" className="flex-1" onClick={togglePlay} disabled={!isOnline}>
-                    {isPlaying ? (
-                      <>
-                        <Pause className="mr-2 h-5 w-5" />
-                        Pause
-                      </>
-                    ) : (
-                      <>
-                        <Play className="mr-2 h-5 w-5" />
-                        Play
-                      </>
-                    )}
-                  </Button>
-                  <Button variant="outline" size="lg" onClick={resetExercise} disabled={!isOnline}>
-                    <RotateCcw className="mr-2 h-4 w-4" />
-                    Restart
-                  </Button>
+                  <iframe
+                    className="absolute top-0 left-0 w-full h-full"
+                    src="https://www.youtube.com/embed/uXcUYS9W0Oc?enablejsapi=1&rel=0"
+                    title="Addiction Meditation"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    loading="lazy"
+                  />
                 </div>
               </CardContent>
             </Card>
