@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Play, Pause, RotateCcw, Volume2, VolumeX, WifiOff } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import BottomNav from '@/components/BottomNav';
+import OfflineIndicator from '@/components/OfflineIndicator';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 const breathingSteps = [
   "Take a slow, deep breath in through your nose for 4 counts...",
@@ -42,6 +45,7 @@ const Cooldown = () => {
   const [selectedTrack, setSelectedTrack] = useState<typeof meditationTracks[0] | null>(null);
   const playerRef = useRef<any>(null);
   const navigate = useNavigate();
+  const isOnline = useOnlineStatus();
 
   // Breathing exercise timer
   useEffect(() => {
@@ -234,6 +238,15 @@ const Cooldown = () => {
 
           {/* Meditation Soundtracks Tab */}
           <TabsContent value="meditation" className="space-y-6">
+            {!isOnline && (
+              <Alert className="bg-yellow-500/10 border-yellow-500/30">
+                <WifiOff className="h-4 w-4" />
+                <AlertDescription>
+                  Internet connection required for meditation videos. Try breathing exercises while offline.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <Card>
               <CardHeader>
                 <CardTitle>Choose Your Meditation</CardTitle>
@@ -260,6 +273,15 @@ const Cooldown = () => {
 
           {/* Timed Session */}
           <TabsContent value="timed" className="space-y-6">
+            {!isOnline && (
+              <Alert className="bg-yellow-500/10 border-yellow-500/30">
+                <WifiOff className="h-4 w-4" />
+                <AlertDescription>
+                  Internet connection required for guided meditation. Try breathing exercises while offline.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-center">
@@ -350,7 +372,7 @@ const Cooldown = () => {
                       size="lg"
                       onClick={togglePlay}
                       className="w-32"
-                      disabled={elapsedTime >= 600}
+                      disabled={elapsedTime >= 600 || !isOnline}
                     >
                       {isPlaying ? (
                         <>
@@ -360,7 +382,7 @@ const Cooldown = () => {
                       ) : (
                         <>
                           <Play className="mr-2 h-5 w-5" />
-                          {elapsedTime >= 600 ? 'Complete' : 'Start'}
+                          {elapsedTime >= 600 ? 'Complete' : !isOnline ? 'Offline' : 'Start'}
                         </>
                       )}
                     </Button>

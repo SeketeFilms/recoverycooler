@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt'],
+      includeAssets: ['favicon.ico', 'robots.txt', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'GambleCooler - Recovery Support',
         short_name: 'GambleCooler',
@@ -43,7 +43,49 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        skipWaiting: true
+        skipWaiting: true,
+        clientsClaim: true,
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/gwexkcgndcslumozhpea\.supabase\.co\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'supabase-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 5 // 5 minutes
+              },
+              networkTimeoutSeconds: 10
+            }
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/cooldown') || 
+                                     url.pathname.startsWith('/help') ||
+                                     url.pathname.startsWith('/home'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 // 1 day
+              }
+            }
+          }
+        ]
       }
     })
   ].filter(Boolean),
