@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { User, LogOut, Save, Moon, Sun, Edit, Camera, Trash2 } from 'lucide-react';
+import { User, LogOut, Save, Moon, Sun, Edit, Camera, Trash2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
@@ -367,6 +367,14 @@ const Profile = () => {
               onClick={() => navigate('/help')}
             >
               Help & FAQ
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => navigate('/security')}
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              Security Settings
             </Button>
           </CardContent>
         </Card>
