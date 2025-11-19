@@ -387,12 +387,13 @@ const Cooldown = () => {
         </Tabs>
 
         {/* Crisis Support */}
-        <Card className="bg-destructive/10 border-destructive/20">
-          <CardContent className="pt-6 space-y-2">
-            <p className="font-medium text-sm">In Crisis? Get Immediate Help:</p>
+        <Card className="bg-gradient-to-br from-destructive/5 to-destructive/10 border-destructive/30 shadow-lg">
+          <CardContent className="pt-6 space-y-3">
+            <p className="font-semibold text-base text-center">Need Immediate Help?</p>
             <Button
               variant="outline"
-              className="w-full justify-start text-sm"
+              size="lg"
+              className="w-full justify-center text-base font-medium border-2 hover:bg-destructive/20 transition-all duration-500 ease-in-out hover:scale-[1.02] hover:shadow-md"
               onClick={() => navigate('/help')}
             >
               View Support Resources
