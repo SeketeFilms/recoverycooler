@@ -21,10 +21,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Set up auth listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // Log session activity on sign in
+      if (event === 'SIGNED_IN' && session) {
+        setTimeout(async () => {
+          try {
+            const userAgent = navigator.userAgent;
+            const deviceInfo = /Mobile|Android|iPhone|iPad|iPod/.test(userAgent) ? 'Mobile' : 'Desktop';
+            
+            await supabase.functions.invoke('log-session-activity', {
+              body: { user_agent: userAgent, device_info: deviceInfo }
+            });
+          } catch (error) {
+            console.error('Failed to log session activity:', error);
+          }
+        }, 0);
+      }
     });
 
     // Check current session

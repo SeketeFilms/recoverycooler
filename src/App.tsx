@@ -12,6 +12,7 @@ import Cooldown from "./pages/Cooldown";
 import Spending from "./pages/Spending";
 import Exclusion from "./pages/Exclusion";
 import Profile from "./pages/Profile";
+import Security from "./pages/Security";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 
@@ -72,6 +73,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Help />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/security"
+              element={
+                <ProtectedRoute>
+                  <Security />
                 </ProtectedRoute>
               }
             />
