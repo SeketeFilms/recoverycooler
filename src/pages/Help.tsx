@@ -128,7 +128,7 @@ const Help = () => {
         {/* Emergency Contacts */}
         <Card className="gentle-fade-in bg-destructive/10 border-destructive/30">
           <CardHeader>
-            <CardTitle className="text-lg">🆘 Need Immediate Help?</CardTitle>
+            <CardTitle className="text-lg">Need Immediate Help?</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {resources.helplines.map((helpline, index) => (

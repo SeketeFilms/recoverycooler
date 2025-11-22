@@ -164,7 +164,7 @@ const Exclusion = () => {
 
         <Card className="bg-accent/10 border-accent/20">
           <CardContent className="pt-6 space-y-2">
-            <p className="font-medium text-sm">💡 How it works:</p>
+            <p className="font-medium text-sm">How it works:</p>
             <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
               <li>Blocked sites are stored in your personal list</li>
               <li>Share this list with accountability partners</li>

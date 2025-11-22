@@ -87,13 +87,13 @@ const Onboarding = () => {
                 <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
                   <RadioGroupItem value="gambling" id="gambling" />
                   <Label htmlFor="gambling" className="cursor-pointer flex-1 font-normal">
-                    🎲 Gambling Addiction
+                    Gambling Addiction
                   </Label>
                 </div>
                 <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
                   <RadioGroupItem value="alcohol" id="alcohol" />
                   <Label htmlFor="alcohol" className="cursor-pointer flex-1 font-normal">
-                    🍺 Alcohol Addiction
+                    Alcohol Addiction
                   </Label>
                 </div>
               </RadioGroup>
