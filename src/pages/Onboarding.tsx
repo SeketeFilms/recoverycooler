@@ -10,6 +10,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { ChevronRight } from 'lucide-react';
+import { z } from 'zod';
+
+const onboardingSchema = z.object({
+  fullName: z.string()
+    .trim()
+    .min(1, 'Name is required')
+    .max(100, 'Name must be less than 100 characters')
+    .regex(/^[a-zA-Z\s'\-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes'),
+  country: z.string().length(2, 'Invalid country code'),
+  addictionType: z.union([z.literal('gambling'), z.literal('alcohol')])
+});
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -28,14 +39,27 @@ const Onboarding = () => {
       return;
     }
 
+    // Validate form data
+    const validation = onboardingSchema.safeParse({
+      fullName: fullName.trim(),
+      country,
+      addictionType
+    });
+
+    if (!validation.success) {
+      const firstError = validation.error.issues[0];
+      toast.error(firstError.message);
+      return;
+    }
+
     setIsLoading(true);
 
     const { error } = await supabase
       .from('profiles')
       .update({
-        full_name: fullName,
-        country: country,
-        addiction_type: addictionType,
+        full_name: validation.data.fullName,
+        country: validation.data.country,
+        addiction_type: validation.data.addictionType,
       })
       .eq('user_id', user.id);
 
