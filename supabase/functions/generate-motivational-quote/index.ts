@@ -29,7 +29,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a compassionate recovery coach. Generate short, powerful motivational quotes for people recovering from addiction. Keep quotes under 100 characters. Be empowering and positive.'
+            content: `You are a compassionate recovery coach. Generate short, powerful motivational quotes for people recovering from addiction. Keep quotes under 100 characters. Be empowering and positive. Focus on themes of self-worth, healing, and personal strength.${addictionType === 'pornography' ? ' For pornography recovery, emphasize brain rewiring, healthy relationships, and reclaiming authentic connection.' : ''}`
           },
           {
             role: 'user',
