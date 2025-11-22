@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, DollarSign, Shield, User, HelpCircle, LogOut, MessageSquare } from 'lucide-react';
+import { Sparkles, DollarSign, Shield, HelpCircle, LogOut, MessageSquare } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import InstallPrompt from '@/components/InstallPrompt';
 
@@ -150,15 +150,6 @@ const Home = () => {
           </Button>
         </div>
 
-        <Button
-          variant="secondary"
-          size="lg"
-          className="w-full"
-          onClick={() => navigate('/profile')}
-        >
-          <User className="mr-2 h-5 w-5" />
-          Profile & Settings
-        </Button>
       </div>
       <BottomNav />
       <InstallPrompt />

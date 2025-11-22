@@ -11,37 +11,42 @@ const RebuildLife = () => {
     {
       icon: DollarSign,
       title: 'Finance Recovery',
-      description: 'Rebuild your financial health with budgeting tools and debt management strategies',
+      description: 'Rebuild your financial health one step at a time.',
       color: 'from-green-500/20 to-green-600/20',
       borderColor: 'border-green-500/30',
+      path: '/rebuild-life/finance',
     },
     {
       icon: Heart,
       title: 'Relationship Healing',
-      description: 'Learn to rebuild trust and create healthier connections with loved ones',
+      description: 'Learn to rebuild trust and strengthen the bonds around you.',
       color: 'from-rose-500/20 to-rose-600/20',
       borderColor: 'border-rose-500/30',
+      path: '/rebuild-life/relationships',
     },
     {
       icon: TrendingUp,
       title: 'Build New Habits',
-      description: 'Replace old patterns with positive routines that support your recovery',
+      description: 'Replace old patterns with positive routines that support recovery.',
       color: 'from-blue-500/20 to-blue-600/20',
       borderColor: 'border-blue-500/30',
+      path: '/rebuild-life/habits',
     },
     {
       icon: Target,
       title: 'Set Future Goals',
-      description: 'Create a vision for your future and develop actionable steps to get there',
+      description: 'Create a vision for your life and break it into actionable steps.',
       color: 'from-purple-500/20 to-purple-600/20',
       borderColor: 'border-purple-500/30',
+      path: '/rebuild-life/goals',
     },
     {
       icon: Brain,
       title: 'Mental Health Support',
-      description: 'Access resources and techniques for managing stress, anxiety, and emotions',
+      description: 'Manage stress, emotions, and mental challenges with evidence-based tools.',
       color: 'from-amber-500/20 to-amber-600/20',
       borderColor: 'border-amber-500/30',
+      path: '/rebuild-life/mental-health',
     },
   ];
 
@@ -77,9 +82,7 @@ const RebuildLife = () => {
               <Card
                 key={index}
                 className={`bg-gradient-to-br ${module.color} ${module.borderColor} hover:scale-[1.02] transition-transform duration-300 cursor-pointer`}
-                onClick={() => {
-                  // TODO: Navigate to specific module when implemented
-                }}
+                onClick={() => navigate(module.path)}
               >
                 <CardHeader>
                   <div className="flex items-start gap-4">
@@ -100,14 +103,10 @@ const RebuildLife = () => {
         </div>
 
         <Card className="bg-accent/10 border-accent/20">
-          <CardContent className="pt-6 text-center space-y-3">
-            <p className="font-medium">Each module contains:</p>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>Step-by-step guidance</li>
-              <li>Practical exercises</li>
-              <li>Progress tracking</li>
-              <li>Professional resources</li>
-            </ul>
+          <CardContent className="pt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Step-by-step guidance | Practical exercises | Progress tracking | Professional resources
+            </p>
           </CardContent>
         </Card>
       </div>

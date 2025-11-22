@@ -17,6 +17,11 @@ import Security from "./pages/Security";
 import Help from "./pages/Help";
 import AIChatPage from "./pages/AIChat";
 import RebuildLife from "./pages/RebuildLife";
+import FinanceRecovery from "./pages/modules/FinanceRecovery";
+import RelationshipHealing from "./pages/modules/RelationshipHealing";
+import BuildNewHabits from "./pages/modules/BuildNewHabits";
+import SetFutureGoals from "./pages/modules/SetFutureGoals";
+import MentalHealthSupport from "./pages/modules/MentalHealthSupport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -101,6 +106,46 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <RebuildLife />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rebuild-life/finance"
+              element={
+                <ProtectedRoute>
+                  <FinanceRecovery />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rebuild-life/relationships"
+              element={
+                <ProtectedRoute>
+                  <RelationshipHealing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rebuild-life/habits"
+              element={
+                <ProtectedRoute>
+                  <BuildNewHabits />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rebuild-life/goals"
+              element={
+                <ProtectedRoute>
+                  <SetFutureGoals />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rebuild-life/mental-health"
+              element={
+                <ProtectedRoute>
+                  <MentalHealthSupport />
                 </ProtectedRoute>
               }
             />
