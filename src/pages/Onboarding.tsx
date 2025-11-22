@@ -19,7 +19,7 @@ const onboardingSchema = z.object({
     .max(100, 'Name must be less than 100 characters')
     .regex(/^[a-zA-Z\s'\-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes'),
   country: z.string().length(2, 'Invalid country code'),
-  addictionType: z.union([z.literal('gambling'), z.literal('alcohol')])
+  addictionType: z.union([z.literal('gambling'), z.literal('alcohol'), z.literal('pornography')])
 });
 
 const Onboarding = () => {
@@ -27,7 +27,7 @@ const Onboarding = () => {
   const { user } = useAuth();
   const [fullName, setFullName] = useState('');
   const [country, setCountry] = useState('US');
-  const [addictionType, setAddictionType] = useState<'gambling' | 'alcohol'>('gambling');
+  const [addictionType, setAddictionType] = useState<'gambling' | 'alcohol' | 'pornography'>('gambling');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,7 +105,7 @@ const Onboarding = () => {
               <Label className="text-base font-semibold">I'm seeking help with</Label>
               <RadioGroup 
                 value={addictionType} 
-                onValueChange={(value) => setAddictionType(value as 'gambling' | 'alcohol')} 
+                onValueChange={(value) => setAddictionType(value as 'gambling' | 'alcohol' | 'pornography')} 
                 className="mt-3 space-y-3"
               >
                 <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
@@ -118,6 +118,12 @@ const Onboarding = () => {
                   <RadioGroupItem value="alcohol" id="alcohol" />
                   <Label htmlFor="alcohol" className="cursor-pointer flex-1 font-normal">
                     Alcohol Addiction
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
+                  <RadioGroupItem value="pornography" id="pornography" />
+                  <Label htmlFor="pornography" className="cursor-pointer flex-1 font-normal">
+                    Pornography Addiction
                   </Label>
                 </div>
               </RadioGroup>

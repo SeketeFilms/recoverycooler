@@ -20,6 +20,10 @@ export type CountryResources = {
     helplines: HelplineResource[];
     websites: WebsiteResource[];
   };
+  pornography: {
+    helplines: HelplineResource[];
+    websites: WebsiteResource[];
+  };
 };
 
 export const countryResources: Record<string, CountryResources> = {
@@ -43,6 +47,18 @@ export const countryResources: Record<string, CountryResources> = {
       websites: [
         { name: 'Alcoholics Anonymous', url: 'https://www.aa.org' },
         { name: 'SAMHSA', url: 'https://www.samhsa.gov' },
+      ],
+    },
+    pornography: {
+      helplines: [
+        { name: 'SAMHSA National Helpline', phone: '1-800-662-4357', link: 'tel:1-800-662-4357' },
+        { name: 'Sex Addicts Anonymous', text: 'Visit saa-recovery.org', link: 'https://saa-recovery.org' },
+      ],
+      websites: [
+        { name: 'Fight the New Drug', url: 'https://fightthenewdrug.org' },
+        { name: 'NoFap', url: 'https://nofap.com' },
+        { name: 'Sex Addicts Anonymous', url: 'https://saa-recovery.org' },
+        { name: 'Covenant Eyes', url: 'https://www.covenanteyes.com' },
       ],
     },
   },
@@ -69,6 +85,17 @@ export const countryResources: Record<string, CountryResources> = {
         { name: 'Drinkaware', url: 'https://www.drinkaware.co.uk' },
       ],
     },
+    pornography: {
+      helplines: [
+        { name: 'UKCP Therapy', phone: '020 7014 9955', link: 'tel:02070149955' },
+        { name: 'SAA UK', text: 'Visit saa-iso.org', link: 'https://saa-iso.org' },
+      ],
+      websites: [
+        { name: 'Reward Foundation', url: 'https://www.rewardfoundation.org' },
+        { name: 'Sex Addiction Help UK', url: 'https://www.sexaddictionhelp.co.uk' },
+        { name: 'Fight the New Drug', url: 'https://fightthenewdrug.org' },
+      ],
+    },
   },
   CA: {
     name: 'Canada',
@@ -90,6 +117,17 @@ export const countryResources: Record<string, CountryResources> = {
       websites: [
         { name: 'AA Canada', url: 'https://aa.org' },
         { name: 'Canadian Centre on Substance Use', url: 'https://www.ccsa.ca' },
+      ],
+    },
+    pornography: {
+      helplines: [
+        { name: 'Canadian Mental Health Association', phone: '1-833-456-4566', link: 'tel:1-833-456-4566' },
+        { name: 'SAA Canada', text: 'Visit saa-recovery.org', link: 'https://saa-recovery.org' },
+      ],
+      websites: [
+        { name: 'Sex Addicts Anonymous', url: 'https://saa-recovery.org' },
+        { name: 'Canadian Centre for Addiction', url: 'https://www.ccsa.ca' },
+        { name: 'Fight the New Drug', url: 'https://fightthenewdrug.org' },
       ],
     },
   },
@@ -115,6 +153,17 @@ export const countryResources: Record<string, CountryResources> = {
         { name: 'Alcohol and Drug Foundation', url: 'https://adf.org.au' },
       ],
     },
+    pornography: {
+      helplines: [
+        { name: 'Lifeline Australia', phone: '13 11 14', link: 'tel:131114' },
+        { name: 'SAA Australia', text: 'Visit saa-recovery.org', link: 'https://saa-recovery.org' },
+      ],
+      websites: [
+        { name: 'Reach Out Australia', url: 'https://www.reachout.com' },
+        { name: 'Sex Addicts Anonymous', url: 'https://saa-recovery.org' },
+        { name: 'Fight the New Drug', url: 'https://fightthenewdrug.org' },
+      ],
+    },
   },
 };
 
@@ -136,6 +185,17 @@ export const DEFAULT_RESOURCES: CountryResources = {
     websites: [
       { name: 'Alcoholics Anonymous', url: 'https://www.aa.org' },
       { name: 'World Health Organization', url: 'https://www.who.int/health-topics/alcohol' },
+    ],
+  },
+  pornography: {
+    helplines: [
+      { name: 'Sex Addicts Anonymous', text: 'Visit saa-recovery.org', link: 'https://saa-recovery.org' },
+    ],
+    websites: [
+      { name: 'Sex Addicts Anonymous', url: 'https://saa-recovery.org' },
+      { name: 'Fight the New Drug', url: 'https://fightthenewdrug.org' },
+      { name: 'NoFap', url: 'https://nofap.com' },
+      { name: 'Fortify Program', url: 'https://www.joinfortify.com' },
     ],
   },
 };
