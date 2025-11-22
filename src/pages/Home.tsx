@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, DollarSign, Shield, User, HelpCircle, LogOut } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import InstallPrompt from '@/components/InstallPrompt';
 
 const motivationalQuotes = {
   gambling: [
@@ -146,6 +147,7 @@ const Home = () => {
         </Button>
       </div>
       <BottomNav />
+      <InstallPrompt />
     </div>
   );
 };
