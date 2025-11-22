@@ -16,7 +16,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.track-session]
-verify_jwt = false
+verify_jwt = true
 
 [functions.ai-recovery-chat]
 verify_jwt = true
