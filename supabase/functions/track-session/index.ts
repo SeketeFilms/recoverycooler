@@ -16,18 +16,19 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('No or invalid authorization header');
     }
 
-    const supabase = createClient(
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(jwt);
     if (userError || !user) {
+      console.error('Error fetching user in track-session:', userError);
       throw new Error('Unauthorized');
     }
 
@@ -70,14 +71,14 @@ serve(async (req) => {
         
         try {
           // Get user's push subscriptions
-          const { data: subscriptions } = await supabase
+          const { data: subscriptions } = await supabaseClient
             .from('push_subscriptions')
             .select('*')
             .eq('user_id', userId);
 
           if (subscriptions && subscriptions.length > 0) {
             // Call function to send push notification
-            await supabase.functions.invoke('send-session-reminder', {
+            await supabaseClient.functions.invoke('send-session-reminder', {
               body: { userId, subscriptions }
             });
             
