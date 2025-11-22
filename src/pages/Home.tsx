@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, DollarSign, Shield, User, HelpCircle, LogOut } from 'lucide-react';
+import { Sparkles, DollarSign, Shield, User, HelpCircle, LogOut, MessageSquare } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import InstallPrompt from '@/components/InstallPrompt';
 
@@ -66,7 +66,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 pb-32">
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between gentle-fade-in">
@@ -97,42 +97,56 @@ const Home = () => {
           </CardContent>
         </Card>
 
-        {/* Emergency Cooldown Button */}
-        <div className="flex justify-center py-12">
-          <button
-            onClick={() => navigate('/cooldown')}
-            className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-full bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground shadow-2xl hover:shadow-[0_20px_60px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-105 breathe-animation"
-          >
-            <div className="text-center space-y-2 px-4">
-              <p className="text-xl sm:text-2xl font-bold">I NEED HELP</p>
-              <p className="text-xs sm:text-sm opacity-90">Tap for immediate support</p>
-            </div>
-          </button>
-        </div>
+        {/* I Need Help Button */}
+        <Button 
+          size="default"
+          onClick={() => navigate('/cooldown')}
+          className="w-full py-6 text-base font-semibold bg-gradient-to-r from-destructive to-destructive/80 hover:from-destructive/90 hover:to-destructive/70 transform transition-all duration-300 ease-in-out hover:scale-[1.01] hover:shadow-lg shadow-destructive/30"
+        >
+          I Need Help
+        </Button>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Button
+        <div className="grid grid-cols-2 gap-4">
+          <Button 
             variant="outline"
-            size="lg"
-            className="h-24 flex-col gap-2"
+            className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
             onClick={() => navigate('/spending')}
           >
-            <DollarSign className="w-6 h-6 sm:w-8 sm:h-8" />
-            <span className="text-sm sm:text-base">
-              {addictionType === 'gambling' ? 'Gambling Tracker' : 'Alcohol Tracker'}
+            <DollarSign className="h-6 w-6" />
+            <span className="text-sm font-medium">
+              {addictionType === 'gambling' ? 'Spending Tracker' : 'Alcohol Spending'}
             </span>
           </Button>
-          <Button
+          <Button 
             variant="outline"
-            size="lg"
-            className="h-24 flex-col gap-2"
+            className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
             onClick={() => navigate('/exclusion')}
           >
-            <Shield className="w-6 h-6 sm:w-8 sm:h-8" />
-            <span className="text-sm sm:text-base">
-              {addictionType === 'gambling' ? 'Site Blocking' : 'Venue Blocking'}
+            <Shield className="h-6 w-6" />
+            <span className="text-sm font-medium">
+              {addictionType === 'gambling' ? 'Blocking' : 'Outlet Blocking'}
             </span>
+          </Button>
+        </div>
+
+        {/* AI Chat & Rebuild Life */}
+        <div className="grid grid-cols-1 gap-4">
+          <Button 
+            variant="outline"
+            className="h-20 flex items-center justify-center gap-3 hover:bg-accent/20 hover:border-accent/50 transition-all"
+            onClick={() => navigate('/ai-chat')}
+          >
+            <MessageSquare className="h-5 w-5" />
+            <span className="font-medium">24/7 AI Recovery Assistant</span>
+          </Button>
+          <Button 
+            variant="outline"
+            className="h-20 flex items-center justify-center gap-3 hover:bg-primary/10 hover:border-primary/50 transition-all"
+            onClick={() => navigate('/rebuild-life')}
+          >
+            <Sparkles className="h-5 w-5" />
+            <span className="font-medium">Rebuild My Life</span>
           </Button>
         </div>
 

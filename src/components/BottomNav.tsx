@@ -14,9 +14,9 @@ const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl z-50">
-      <div className="max-w-2xl mx-auto px-6">
-        <div className="flex items-center justify-around h-20">
+    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-6">
+      <div className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl">
+        <div className="flex items-center justify-around h-20 px-4">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;

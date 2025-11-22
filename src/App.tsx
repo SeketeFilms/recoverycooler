@@ -15,6 +15,8 @@ import Exclusion from "./pages/Exclusion";
 import Profile from "./pages/Profile";
 import Security from "./pages/Security";
 import Help from "./pages/Help";
+import AIChatPage from "./pages/AIChat";
+import RebuildLife from "./pages/RebuildLife";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -83,6 +85,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Security />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ai-chat"
+              element={
+                <ProtectedRoute>
+                  <AIChatPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rebuild-life"
+              element={
+                <ProtectedRoute>
+                  <RebuildLife />
                 </ProtectedRoute>
               }
             />
