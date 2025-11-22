@@ -5,38 +5,32 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const getSystemPrompt = (addictionType: string) => {
+  const basePrompt = "You are a compassionate 24/7 recovery assistant. Provide supportive, non-judgmental guidance. Keep responses concise and actionable.";
+  
+  const specificGuidance: Record<string, string> = {
+    gambling: " Focus on urge management, financial recovery, and healthy alternatives to gambling. Emphasize pause-and-breathe techniques.",
+    alcohol: " Focus on sobriety maintenance, trigger management, and healthy coping mechanisms. Encourage attending support groups.",
+    pornography: " Focus on brain rewiring, healthy relationships, and authentic connection. Emphasize neuroplasticity and building new habits. Help identify triggers and provide accountability support."
+  };
+  
+  return basePrompt + (specificGuidance[addictionType] || specificGuidance.gambling);
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, addictionType = 'gambling' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const systemPrompt = `You are a compassionate 24/7 AI recovery assistant helping people overcome addiction (gambling or alcohol). Your role is to:
-
-1. Provide emotional support and validate their feelings
-2. Help them work through cravings with coping strategies
-3. Offer motivational words and encouragement
-4. Remind them of their progress and reasons for recovery
-5. Suggest healthy alternatives and positive coping mechanisms
-6. Be empathetic, non-judgmental, and understanding
-
-Guidelines:
-- Keep responses concise but caring (2-4 sentences typically)
-- Focus on immediate support during cravings
-- Encourage them to reach out to professional help when needed
-- Remind them they're not alone
-- Use a warm, supportive tone
-- Avoid being preachy or overly clinical
-- Acknowledge that recovery is not linear
-
-Remember: You're a supportive companion, not a replacement for professional treatment.`;
+    const systemPrompt = getSystemPrompt(addictionType);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
