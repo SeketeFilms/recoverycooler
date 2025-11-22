@@ -11,17 +11,22 @@ const SessionTracker = () => {
     if (!user) return;
 
     try {
-      // Ensure we have a valid session before calling the function
+      // Get fresh session and ensure it's valid
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (sessionError || !session) {
-        console.error('No valid session for activity tracking');
+      if (sessionError || !session?.access_token) {
+        console.error('No valid session for activity tracking:', sessionError);
         return;
       }
 
-      await supabase.functions.invoke('track-session', {
+      // Call function with explicit authorization
+      const { error } = await supabase.functions.invoke('track-session', {
         body: { activity },
       });
+
+      if (error) {
+        console.error('Error invoking track-session:', error);
+      }
     } catch (error) {
       console.error('Error reporting activity:', error);
     }
