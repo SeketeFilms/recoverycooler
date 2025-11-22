@@ -102,7 +102,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "GambleCooler <info@se-mo.site>",
+        from: "RecoveryCooler <info@se-mo.site>",
         to: [to],
         subject: escapeHtml(subject),
         html: html, // HTML is now pre-sanitized by Auth.tsx

@@ -82,23 +82,23 @@ const Auth = () => {
           const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email', {
             body: {
               to: email,
-              subject: 'Welcome to GambleCooler - Your Journey to Recovery Starts Here',
+              subject: 'Welcome to RecoveryCooler - Your Journey to Recovery Starts Here',
               html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                   <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="color: #6366f1; font-size: 32px; margin-bottom: 10px;">🧘 GambleCooler</h1>
+                    <h1 style="color: #6366f1; font-size: 32px; margin-bottom: 10px;">RecoveryCooler</h1>
                     <p style="color: #666; font-size: 18px;">Welcome to Your Journey</p>
                   </div>
                   
                   <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 30px; border-radius: 12px; margin-bottom: 30px;">
                     <h2 style="color: #1e40af; margin-top: 0;">Welcome, ${escapeHtml(fullName)}!</h2>
                     <p style="color: #334155; line-height: 1.6; font-size: 16px;">
-                      We're honored that you've chosen to take this brave step with GambleCooler. Recovery is not about perfection—it's about progress, one mindful moment at a time.
+                      We're honored that you've chosen to take this brave step with RecoveryCooler. Recovery is not about perfection—it's about progress, one mindful moment at a time.
                     </p>
                   </div>
                   
                   <div style="margin-bottom: 30px;">
-                    <h3 style="color: #1e40af; margin-bottom: 15px;">What Makes GambleCooler Different?</h3>
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">What Makes RecoveryCooler Different?</h3>
                     <ul style="color: #334155; line-height: 1.8; font-size: 15px;">
                       <li><strong>Guided Breathing Exercises:</strong> Calm your mind when urges strike with our proven breathing techniques</li>
                       <li><strong>Spending Tracker:</strong> Set daily limits and track your progress with compassion, not judgment</li>
@@ -120,7 +120,7 @@ const Auth = () => {
                     </p>
                     <p style="color: #94a3b8; font-size: 13px; margin-top: 20px;">
                       With compassion and support,<br>
-                      <strong>The GambleCooler Team</strong>
+                      <strong>The RecoveryCooler Team</strong>
                     </p>
                   </div>
                 </div>
@@ -135,7 +135,7 @@ const Auth = () => {
           console.error('Error sending welcome email:', emailError);
         }
         
-        toast.success('Account created! Welcome to GambleCooler');
+        toast.success('Account created! Welcome to RecoveryCooler');
         navigate('/home');
       } else {
         const { error } = await signIn(email, password);
