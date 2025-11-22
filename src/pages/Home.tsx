@@ -29,11 +29,21 @@ const motivationalQuotes = {
     "Small steps lead to lasting sobriety.",
     "Choose clarity over chaos. You can do this.",
   ],
+  pornography: [
+    "Your brain is healing. Every day builds new pathways.",
+    "Real connection awaits beyond the screen.",
+    "You are reclaiming your authentic self.",
+    "The urge will fade. Your worth remains constant.",
+    "One moment of strength at a time.",
+    "You're rewiring your mind for healthy relationships.",
+    "Your future self will thank you for today's choice.",
+    "Choose presence over pixels. You've got this.",
+  ],
 };
 
 const Home = () => {
   const [quote, setQuote] = useState('');
-  const [addictionType, setAddictionType] = useState<'gambling' | 'alcohol'>('gambling');
+  const [addictionType, setAddictionType] = useState<'gambling' | 'alcohol' | 'pornography'>('gambling');
   const [appName, setAppName] = useState('Recovery App');
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -51,7 +61,7 @@ const Home = () => {
       .eq('user_id', user.id)
       .single();
 
-    const type = (data?.addiction_type as 'gambling' | 'alcohol') || 'gambling';
+    const type = (data?.addiction_type as 'gambling' | 'alcohol' | 'pornography') || 'gambling';
     setAddictionType(type);
     setAppName('Recovery Cooler');
     
