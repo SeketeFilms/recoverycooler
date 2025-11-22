@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'icon-192.png', 'icon-512.png'],
       manifest: {
-        name: 'GambleCooler - Recovery Support',
-        short_name: 'GambleCooler',
+        name: 'RecoveryCooler - Recovery Support',
+        short_name: 'RecoveryCooler',
         description: 'Mindful recovery support app to manage gambling and alcohol urges',
         theme_color: '#14B8A6',
         background_color: '#0A0A0A',

@@ -20,7 +20,7 @@ const ShareJourney = () => {
   };
 
   const shareMessage = encodeURIComponent(
-    "I'm using GambleCooler to support my recovery journey. Check it out: " + appUrl
+    "I'm using RecoveryCooler to support my recovery journey. Check it out: " + appUrl
   );
 
   const shareLinks = [
