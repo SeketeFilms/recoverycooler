@@ -6,7 +6,7 @@ import { ToastAction } from "@/components/ui/toast";
 import App from "./App.tsx";
 import "./index.css";
 
-// Register service worker for PWA
+// Register main service worker for PWA
 const updateSW = registerSW({
   onNeedRefresh() {
     toast({
@@ -27,6 +27,17 @@ const updateSW = registerSW({
     });
   },
 });
+
+// Register push notification service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(registration => {
+      console.log('Push notification service worker registered:', registration);
+    })
+    .catch(error => {
+      console.error('Push notification service worker registration failed:', error);
+    });
+}
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
