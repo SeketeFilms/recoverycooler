@@ -11,6 +11,14 @@ const SessionTracker = () => {
     if (!user) return;
 
     try {
+      // Ensure we have a valid session before calling the function
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error('No valid session for activity tracking');
+        return;
+      }
+
       await supabase.functions.invoke('track-session', {
         body: { activity },
       });
