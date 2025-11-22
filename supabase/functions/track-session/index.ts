@@ -59,36 +59,8 @@ serve(async (req) => {
       console.log(`User ${user.id} went inactive`);
     }
 
-    // Check for users who need reminders (30 minutes inactive)
-    const THIRTY_MINUTES = 30 * 60 * 1000;
-    
-    for (const [userId, session] of activeSessions.entries()) {
-      const timeSinceActivity = now - session.lastActivity;
-      
-      if (timeSinceActivity >= THIRTY_MINUTES && !session.reminderSent) {
-        // Send reminder
-        console.log(`Sending reminder to user ${userId} after ${timeSinceActivity / 1000 / 60} minutes`);
-        
-        try {
-          // Get user's push subscriptions
-          const { data: subscriptions } = await supabaseClient
-            .from('push_subscriptions')
-            .select('*')
-            .eq('user_id', userId);
-
-          if (subscriptions && subscriptions.length > 0) {
-            // Call function to send push notification
-            await supabaseClient.functions.invoke('send-session-reminder', {
-              body: { userId, subscriptions }
-            });
-            
-            session.reminderSent = true;
-          }
-        } catch (error) {
-          console.error('Error sending session reminder:', error);
-        }
-      }
-    }
+    // Note: Push notifications are now handled by PushAlert
+    // The session reminder logic has been removed
 
     return new Response(
       JSON.stringify({ success: true, timestamp: now }),

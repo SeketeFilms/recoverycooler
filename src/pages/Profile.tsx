@@ -25,7 +25,6 @@ import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
 import { useTheme } from 'next-themes';
 import BottomNav from '@/components/BottomNav';
-import PushNotificationManager from '@/components/PushNotificationManager';
 
 const profileSchema = z.object({
   fullName: z.string().trim().max(100, 'Name too long'),
@@ -342,8 +341,6 @@ const Profile = () => {
             </div>
           </CardContent>
         </Card>
-
-        <PushNotificationManager />
 
         <Card>
           <CardHeader>
