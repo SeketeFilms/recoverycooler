@@ -22,6 +22,9 @@ import RelationshipHealing from "./pages/modules/RelationshipHealing";
 import BuildNewHabits from "./pages/modules/BuildNewHabits";
 import SetFutureGoals from "./pages/modules/SetFutureGoals";
 import MentalHealthSupport from "./pages/modules/MentalHealthSupport";
+import Progress from "./pages/Progress";
+import Journal from "./pages/Journal";
+import Crisis from "./pages/Crisis";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -146,6 +149,30 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <MentalHealthSupport />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/progress"
+              element={
+                <ProtectedRoute>
+                  <Progress />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/journal"
+              element={
+                <ProtectedRoute>
+                  <Journal />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/crisis"
+              element={
+                <ProtectedRoute>
+                  <Crisis />
                 </ProtectedRoute>
               }
             />

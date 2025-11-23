@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          badge_color: string
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          name: string
+          requirement_type: string
+          requirement_value: number
+        }
+        Insert: {
+          badge_color?: string
+          created_at?: string
+          description: string
+          icon: string
+          id?: string
+          name: string
+          requirement_type: string
+          requirement_value: number
+        }
+        Update: {
+          badge_color?: string
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          requirement_type?: string
+          requirement_value?: number
+        }
+        Relationships: []
+      }
       chat_conversations: {
         Row: {
           addiction_type: string
@@ -70,6 +103,36 @@ export type Database = {
           },
         ]
       }
+      crisis_resources: {
+        Row: {
+          addiction_type: string
+          content: Json
+          created_at: string
+          description: string
+          id: string
+          resource_type: string
+          title: string
+        }
+        Insert: {
+          addiction_type: string
+          content: Json
+          created_at?: string
+          description: string
+          id?: string
+          resource_type: string
+          title: string
+        }
+        Update: {
+          addiction_type?: string
+          content?: Json
+          created_at?: string
+          description?: string
+          id?: string
+          resource_type?: string
+          title?: string
+        }
+        Relationships: []
+      }
       email_rate_limits: {
         Row: {
           created_at: string
@@ -84,6 +147,45 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          coping_strategies_used: string[] | null
+          created_at: string
+          entry_date: string
+          gratitude: string | null
+          id: string
+          mood: number | null
+          notes: string | null
+          triggers: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coping_strategies_used?: string[] | null
+          created_at?: string
+          entry_date?: string
+          gratitude?: string | null
+          id?: string
+          mood?: number | null
+          notes?: string | null
+          triggers?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coping_strategies_used?: string[] | null
+          created_at?: string
+          entry_date?: string
+          gratitude?: string | null
+          id?: string
+          mood?: number | null
+          notes?: string | null
+          triggers?: string[] | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -157,6 +259,42 @@ export type Database = {
           updated_at?: string
           user_id?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      progress_tracking: {
+        Row: {
+          clean_since: string
+          created_at: string
+          current_streak: number
+          id: string
+          last_check_in: string | null
+          longest_streak: number
+          total_check_ins: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          clean_since?: string
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_check_in?: string | null
+          longest_streak?: number
+          total_check_ins?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          clean_since?: string
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_check_in?: string | null
+          longest_streak?: number
+          total_check_ins?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -291,6 +429,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
