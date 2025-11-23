@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, DollarSign, Shield, HelpCircle, LogOut, MessageSquare, TrendingUp, BookOpen, AlertCircle, Users } from 'lucide-react';
+import { Sparkles, DollarSign, Shield, HelpCircle, LogOut, MessageSquare, AlertCircle } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import InstallPrompt from '@/components/InstallPrompt';
 
@@ -120,27 +120,11 @@ const Home = () => {
         <div className="grid grid-cols-2 gap-4">
           <Button 
             variant="outline"
-            className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
-            onClick={() => navigate('/progress')}
-          >
-            <TrendingUp className="h-6 w-6" />
-            <span className="text-sm font-medium">Progress Tracker</span>
-          </Button>
-          <Button 
-            variant="outline"
-            className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
-            onClick={() => navigate('/journal')}
-          >
-            <BookOpen className="h-6 w-6" />
-            <span className="text-sm font-medium">Recovery Journal</span>
-          </Button>
-          <Button 
-            variant="outline"
             className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-destructive/10 hover:border-destructive/50 transition-all"
-            onClick={() => navigate('/crisis')}
+            onClick={() => navigate('/cooldown')}
           >
             <AlertCircle className="h-6 w-6 text-destructive" />
-            <span className="text-sm font-medium">Crisis Support</span>
+            <span className="text-sm font-medium">Need Help Now</span>
           </Button>
           <Button 
             variant="outline"
@@ -173,26 +157,6 @@ const Home = () => {
           >
             <MessageSquare className="h-5 w-5" />
             <span className="text-sm font-medium">AI Assistant</span>
-          </Button>
-        </div>
-
-        {/* Community & Prevention */}
-        <div className="grid grid-cols-2 gap-4">
-          <Button 
-            variant="outline"
-            className="h-20 flex items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
-            onClick={() => navigate('/community')}
-          >
-            <Users className="h-5 w-5" />
-            <span className="text-sm font-medium">Community</span>
-          </Button>
-          <Button 
-            variant="outline"
-            className="h-20 flex items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
-            onClick={() => navigate('/relapse-prevention')}
-          >
-            <Shield className="h-5 w-5" />
-            <span className="text-sm font-medium">Prevention</span>
           </Button>
         </div>
 
