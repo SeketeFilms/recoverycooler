@@ -49,7 +49,7 @@ const AIChat = ({ showHistory = true }: AIChatProps) => {
         .from('profiles')
         .select('addiction_type')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const userAddictionType = profile?.addiction_type || 'gambling';
       setAddictionType(userAddictionType);
