@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import Security from "./pages/Security";
 import Help from "./pages/Help";
 import Settings from "./pages/Settings";
+import ShortcutsSettings from "./pages/ShortcutsSettings";
 import Community from "./pages/Community";
 import RelapsePrevention from "./pages/RelapsePrevention";
 import AIChatPage from "./pages/AIChat";
@@ -200,6 +201,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings/shortcuts"
+              element={
+                <ProtectedRoute>
+                  <ShortcutsSettings />
                 </ProtectedRoute>
               }
             />
