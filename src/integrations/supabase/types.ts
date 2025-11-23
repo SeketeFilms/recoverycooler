@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      accountability_partners: {
+        Row: {
+          created_at: string
+          id: string
+          partner_user_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          partner_user_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          partner_user_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       achievements: {
         Row: {
           badge_color: string
@@ -103,6 +127,66 @@ export type Database = {
           },
         ]
       }
+      check_in_schedules: {
+        Row: {
+          check_in_time: string
+          created_at: string
+          frequency: string
+          id: string
+          is_enabled: boolean
+          message: string | null
+          user_id: string
+        }
+        Insert: {
+          check_in_time: string
+          created_at?: string
+          frequency?: string
+          id?: string
+          is_enabled?: boolean
+          message?: string | null
+          user_id: string
+        }
+        Update: {
+          check_in_time?: string
+          created_at?: string
+          frequency?: string
+          id?: string
+          is_enabled?: boolean
+          message?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      coping_strategies: {
+        Row: {
+          created_at: string
+          effectiveness_rating: number | null
+          id: string
+          strategy_description: string
+          strategy_name: string
+          times_used: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          effectiveness_rating?: number | null
+          id?: string
+          strategy_description: string
+          strategy_name: string
+          times_used?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          effectiveness_rating?: number | null
+          id?: string
+          strategy_description?: string
+          strategy_name?: string
+          times_used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       crisis_resources: {
         Row: {
           addiction_type: string
@@ -151,6 +235,74 @@ export type Database = {
         }
         Relationships: []
       }
+      forum_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_posts: {
+        Row: {
+          addiction_type: string
+          comments_count: number
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          addiction_type: string
+          comments_count?: number
+          content: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          addiction_type?: string
+          comments_count?: number
+          content?: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           coping_strategies_used: string[] | null
@@ -160,6 +312,7 @@ export type Database = {
           id: string
           mood: number | null
           notes: string | null
+          photo_url: string | null
           triggers: string[] | null
           updated_at: string
           user_id: string
@@ -172,6 +325,7 @@ export type Database = {
           id?: string
           mood?: number | null
           notes?: string | null
+          photo_url?: string | null
           triggers?: string[] | null
           updated_at?: string
           user_id: string
@@ -184,6 +338,7 @@ export type Database = {
           id?: string
           mood?: number | null
           notes?: string | null
+          photo_url?: string | null
           triggers?: string[] | null
           updated_at?: string
           user_id?: string
@@ -219,6 +374,36 @@ export type Database = {
           meditation_time?: string | null
           recovery_checkins?: boolean | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      personal_triggers: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          severity: number
+          trigger_category: string
+          trigger_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          severity?: number
+          trigger_category: string
+          trigger_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          severity?: number
+          trigger_category?: string
+          trigger_name?: string
           user_id?: string
         }
         Relationships: []
@@ -325,6 +510,42 @@ export type Database = {
         }
         Relationships: []
       }
+      risky_locations: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          latitude: number | null
+          location_name: string
+          longitude: number | null
+          notes: string | null
+          radius: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          latitude?: number | null
+          location_name: string
+          longitude?: number | null
+          notes?: string | null
+          radius?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          latitude?: number | null
+          location_name?: string
+          longitude?: number | null
+          notes?: string | null
+          radius?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       self_exclusion_domains: {
         Row: {
           created_at: string
@@ -426,6 +647,39 @@ export type Database = {
           date?: string
           id?: string
           notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      success_stories: {
+        Row: {
+          addiction_type: string
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          likes_count: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          addiction_type: string
+          content: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          likes_count?: number
+          title: string
+          user_id: string
+        }
+        Update: {
+          addiction_type?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          likes_count?: number
+          title?: string
           user_id?: string
         }
         Relationships: []

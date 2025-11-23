@@ -15,6 +15,8 @@ import Exclusion from "./pages/Exclusion";
 import Profile from "./pages/Profile";
 import Security from "./pages/Security";
 import Help from "./pages/Help";
+import Community from "./pages/Community";
+import RelapsePrevention from "./pages/RelapsePrevention";
 import AIChatPage from "./pages/AIChat";
 import RebuildLife from "./pages/RebuildLife";
 import FinanceRecovery from "./pages/modules/FinanceRecovery";
@@ -173,6 +175,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Crisis />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/community"
+              element={
+                <ProtectedRoute>
+                  <Community />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/relapse-prevention"
+              element={
+                <ProtectedRoute>
+                  <RelapsePrevention />
                 </ProtectedRoute>
               }
             />
