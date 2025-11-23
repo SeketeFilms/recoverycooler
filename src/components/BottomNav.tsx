@@ -1,4 +1,4 @@
-import { Home, TrendingUp, BookOpen, AlertCircle, User } from 'lucide-react';
+import { Home, AlertCircle, DollarSign, User, Settings } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -8,10 +8,10 @@ const BottomNav = () => {
 
   const navItems = [
     { icon: Home, label: 'Home', path: '/home' },
-    { icon: TrendingUp, label: 'Progress', path: '/progress' },
-    { icon: BookOpen, label: 'Journal', path: '/journal' },
-    { icon: AlertCircle, label: 'Crisis', path: '/crisis' },
+    { icon: AlertCircle, label: 'Cooldown', path: '/cooldown' },
+    { icon: DollarSign, label: 'Spending', path: '/spending' },
     { icon: User, label: 'Profile', path: '/profile' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
   return (

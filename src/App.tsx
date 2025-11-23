@@ -15,6 +15,7 @@ import Exclusion from "./pages/Exclusion";
 import Profile from "./pages/Profile";
 import Security from "./pages/Security";
 import Help from "./pages/Help";
+import Settings from "./pages/Settings";
 import Community from "./pages/Community";
 import RelapsePrevention from "./pages/RelapsePrevention";
 import AIChatPage from "./pages/AIChat";
@@ -191,6 +192,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <RelapsePrevention />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
                 </ProtectedRoute>
               }
             />
