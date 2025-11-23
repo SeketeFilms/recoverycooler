@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { MessageCircle, Send } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { MessageCircle, Send, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -43,6 +44,8 @@ const ForumPostDetail = ({ post, open, onOpenChange, onUpdate }: ForumPostDetail
   const [newComment, setNewComment] = useState('');
   const [commentAnonymous, setCommentAnonymous] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleteCommentId, setDeleteCommentId] = useState<string | null>(null);
+  const [deletePostDialog, setDeletePostDialog] = useState(false);
 
   useEffect(() => {
     if (open && post) {
@@ -98,11 +101,60 @@ const ForumPostDetail = ({ post, open, onOpenChange, onUpdate }: ForumPostDetail
     setLoading(false);
   };
 
+  const handleDeleteComment = async (commentId: string) => {
+    const { error } = await supabase
+      .from('forum_comments')
+      .delete()
+      .eq('id', commentId);
+
+    if (error) {
+      toast.error('Failed to delete comment');
+    } else {
+      await supabase
+        .from('forum_posts')
+        .update({ comments_count: Math.max(0, post.comments_count - 1) })
+        .eq('id', post.id);
+
+      toast.success('Comment deleted');
+      setDeleteCommentId(null);
+      loadComments();
+      onUpdate();
+    }
+  };
+
+  const handleDeletePost = async () => {
+    const { error } = await supabase
+      .from('forum_posts')
+      .delete()
+      .eq('id', post.id);
+
+    if (error) {
+      toast.error('Failed to delete post');
+    } else {
+      toast.success('Post deleted');
+      setDeletePostDialog(false);
+      onOpenChange(false);
+      onUpdate();
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{post.title}</DialogTitle>
+          <div className="flex items-start justify-between">
+            <DialogTitle>{post.title}</DialogTitle>
+            {user?.id === post.user_id && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setDeletePostDialog(true)}
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -135,9 +187,21 @@ const ForumPostDetail = ({ post, open, onOpenChange, onUpdate }: ForumPostDetail
               <div className="space-y-3">
                 {comments.map((comment) => (
                   <Card key={comment.id} className="p-4">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {comment.is_anonymous ? 'Anonymous' : 'Community Member'} • {format(new Date(comment.created_at), 'MMM d, yyyy')}
-                    </p>
+                    <div className="flex items-start justify-between mb-2">
+                      <p className="text-sm text-muted-foreground">
+                        {comment.is_anonymous ? 'Anonymous' : 'Community Member'} • {format(new Date(comment.created_at), 'MMM d, yyyy')}
+                      </p>
+                      {user?.id === comment.user_id && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteCommentId(comment.id)}
+                          className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
                     <p className="text-foreground">{comment.content}</p>
                   </Card>
                 ))}
@@ -170,6 +234,46 @@ const ForumPostDetail = ({ post, open, onOpenChange, onUpdate }: ForumPostDetail
           </div>
         </div>
       </DialogContent>
+
+      <AlertDialog open={!!deleteCommentId} onOpenChange={() => setDeleteCommentId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Comment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this comment? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteCommentId && handleDeleteComment(deleteCommentId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={deletePostDialog} onOpenChange={setDeletePostDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Forum Post</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this forum post? This action cannot be undone and will also delete all comments.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeletePost}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 };
