@@ -45,11 +45,13 @@ const Home = () => {
   const [quote, setQuote] = useState('');
   const [addictionType, setAddictionType] = useState<'gambling' | 'alcohol' | 'pornography'>('gambling');
   const [appName, setAppName] = useState('Recovery App');
+  const [shortcuts, setShortcuts] = useState<string[]>([]);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
 
   useEffect(() => {
     loadUserProfile();
+    loadUserShortcuts();
   }, [user]);
 
   const loadUserProfile = async () => {
@@ -70,9 +72,77 @@ const Home = () => {
     setQuote(randomQuote);
   };
 
+  const loadUserShortcuts = async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('user_shortcuts')
+      .select('shortcut_key')
+      .eq('user_id', user.id)
+      .order('position');
+
+    if (data && data.length > 0) {
+      setShortcuts(data.map(s => s.shortcut_key));
+    } else {
+      // Default shortcuts
+      setShortcuts(['progress', 'journal', 'crisis', 'community']);
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/auth');
+  };
+
+  const availableShortcuts = {
+    progress: {
+      icon: Sparkles,
+      label: 'Progress',
+      path: '/progress',
+      color: 'text-primary'
+    },
+    journal: {
+      icon: MessageSquare,
+      label: 'Journal',
+      path: '/journal',
+      color: 'text-accent'
+    },
+    crisis: {
+      icon: AlertCircle,
+      label: 'Crisis Support',
+      path: '/crisis',
+      color: 'text-destructive'
+    },
+    community: {
+      icon: MessageSquare,
+      label: 'Community',
+      path: '/community',
+      color: 'text-primary'
+    },
+    relapse: {
+      icon: Shield,
+      label: 'Relapse Prevention',
+      path: '/relapse-prevention',
+      color: 'text-accent'
+    },
+    exclusion: {
+      icon: Shield,
+      label: addictionType === 'gambling' ? 'Blocking' : 'Outlet Blocking',
+      path: '/exclusion',
+      color: 'text-primary'
+    },
+    ai: {
+      icon: MessageSquare,
+      label: 'AI Assistant',
+      path: '/ai-chat',
+      color: 'text-accent'
+    },
+    help: {
+      icon: HelpCircle,
+      label: 'Help Resources',
+      path: '/help',
+      color: 'text-primary'
+    }
   };
 
   return (
@@ -159,6 +229,41 @@ const Home = () => {
             <span className="text-sm font-medium">AI Assistant</span>
           </Button>
         </div>
+
+        {/* Quick Access Shortcuts */}
+        {shortcuts.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold">Quick Access</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/settings/shortcuts')}
+                className="text-xs"
+              >
+                Customize
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {shortcuts.map((key) => {
+                const shortcut = availableShortcuts[key as keyof typeof availableShortcuts];
+                if (!shortcut) return null;
+                const Icon = shortcut.icon;
+                return (
+                  <Button
+                    key={key}
+                    variant="outline"
+                    className="h-20 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
+                    onClick={() => navigate(shortcut.path)}
+                  >
+                    <Icon className={`h-5 w-5 ${shortcut.color}`} />
+                    <span className="text-sm font-medium">{shortcut.label}</span>
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Rebuild Life */}
         <Button 
