@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Heart, MessageCircle, Users, Award, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import BottomNav from '@/components/BottomNav';
+import StoryDetail from '@/components/StoryDetail';
+import ForumPostDetail from '@/components/ForumPostDetail';
 import { format } from 'date-fns';
 
 interface SuccessStory {
@@ -22,6 +24,7 @@ interface SuccessStory {
   addiction_type: string;
   is_anonymous: boolean;
   likes_count: number;
+  comments_count: number;
   created_at: string;
 }
 
@@ -55,13 +58,24 @@ const Community = () => {
   const [postContent, setPostContent] = useState('');
   const [postAnonymous, setPostAnonymous] = useState(false);
 
+  // Detail view state
+  const [selectedStory, setSelectedStory] = useState<SuccessStory | null>(null);
+  const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
+  const [showStoryDetail, setShowStoryDetail] = useState(false);
+  const [showPostDetail, setShowPostDetail] = useState(false);
+
   useEffect(() => {
     if (user) {
       loadUserProfile();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (addictionType) {
       loadStories();
       loadForumPosts();
     }
-  }, [user]);
+  }, [addictionType]);
 
   const loadUserProfile = async () => {
     if (!user) return;
@@ -82,6 +96,7 @@ const Community = () => {
     const { data, error } = await supabase
       .from('success_stories')
       .select('*')
+      .eq('addiction_type', addictionType)
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -96,6 +111,7 @@ const Community = () => {
     const { data, error } = await supabase
       .from('forum_posts')
       .select('*')
+      .eq('addiction_type', addictionType)
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -225,7 +241,14 @@ const Community = () => {
               </Card>
             ) : (
               stories.map((story) => (
-                <Card key={story.id} className="p-6 hover:shadow-lg transition-shadow">
+                <Card 
+                  key={story.id} 
+                  className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => {
+                    setSelectedStory(story);
+                    setShowStoryDetail(true);
+                  }}
+                >
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h3 className="text-xl font-semibold">{story.title}</h3>
@@ -237,11 +260,15 @@ const Community = () => {
                       {story.addiction_type}
                     </span>
                   </div>
-                  <p className="text-muted-foreground mb-4 whitespace-pre-wrap">{story.content}</p>
+                  <p className="text-muted-foreground mb-4 whitespace-pre-wrap line-clamp-3">{story.content}</p>
                   <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
                       <Heart className="h-4 w-4 mr-1" />
                       {story.likes_count}
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <MessageCircle className="h-4 w-4 mr-1" />
+                      {story.comments_count} comments
                     </Button>
                   </div>
                 </Card>
@@ -294,7 +321,14 @@ const Community = () => {
               </Card>
             ) : (
               forumPosts.map((post) => (
-                <Card key={post.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                <Card 
+                  key={post.id} 
+                  className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => {
+                    setSelectedPost(post);
+                    setShowPostDetail(true);
+                  }}
+                >
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h3 className="text-xl font-semibold">{post.title}</h3>
@@ -306,7 +340,7 @@ const Community = () => {
                       {post.addiction_type}
                     </span>
                   </div>
-                  <p className="text-muted-foreground mb-4">{post.content}</p>
+                  <p className="text-muted-foreground mb-4 line-clamp-3">{post.content}</p>
                   <div className="flex items-center gap-4">
                     <Button variant="ghost" size="sm">
                       <MessageCircle className="h-4 w-4 mr-1" />
@@ -319,6 +353,31 @@ const Community = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {selectedStory && (
+        <StoryDetail
+          story={selectedStory}
+          open={showStoryDetail}
+          onOpenChange={setShowStoryDetail}
+          onUpdate={() => {
+            loadStories();
+            loadForumPosts();
+          }}
+        />
+      )}
+
+      {selectedPost && (
+        <ForumPostDetail
+          post={selectedPost}
+          open={showPostDetail}
+          onOpenChange={setShowPostDetail}
+          onUpdate={() => {
+            loadStories();
+            loadForumPosts();
+          }}
+        />
+      )}
+
       <BottomNav />
     </div>
   );

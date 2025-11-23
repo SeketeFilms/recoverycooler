@@ -654,6 +654,7 @@ export type Database = {
       success_stories: {
         Row: {
           addiction_type: string
+          comments_count: number
           content: string
           created_at: string
           id: string
@@ -664,6 +665,7 @@ export type Database = {
         }
         Insert: {
           addiction_type: string
+          comments_count?: number
           content: string
           created_at?: string
           id?: string
@@ -674,6 +676,7 @@ export type Database = {
         }
         Update: {
           addiction_type?: string
+          comments_count?: number
           content?: string
           created_at?: string
           id?: string
@@ -683,6 +686,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      success_story_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "success_story_comments_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "success_stories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_achievements: {
         Row: {
