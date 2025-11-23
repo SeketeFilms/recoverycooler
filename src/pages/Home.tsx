@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, DollarSign, Shield, HelpCircle, LogOut, MessageSquare } from 'lucide-react';
+import { Sparkles, DollarSign, Shield, HelpCircle, LogOut, MessageSquare, TrendingUp, BookOpen, AlertCircle } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import InstallPrompt from '@/components/InstallPrompt';
 
@@ -121,6 +121,30 @@ const Home = () => {
           <Button 
             variant="outline"
             className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
+            onClick={() => navigate('/progress')}
+          >
+            <TrendingUp className="h-6 w-6" />
+            <span className="text-sm font-medium">Progress Tracker</span>
+          </Button>
+          <Button 
+            variant="outline"
+            className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
+            onClick={() => navigate('/journal')}
+          >
+            <BookOpen className="h-6 w-6" />
+            <span className="text-sm font-medium">Recovery Journal</span>
+          </Button>
+          <Button 
+            variant="outline"
+            className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-destructive/10 hover:border-destructive/50 transition-all"
+            onClick={() => navigate('/crisis')}
+          >
+            <AlertCircle className="h-6 w-6 text-destructive" />
+            <span className="text-sm font-medium">Crisis Support</span>
+          </Button>
+          <Button 
+            variant="outline"
+            className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
             onClick={() => navigate('/spending')}
           >
             <DollarSign className="h-6 w-6" />
@@ -128,37 +152,39 @@ const Home = () => {
               {addictionType === 'gambling' ? 'Spending Tracker' : 'Alcohol Spending'}
             </span>
           </Button>
+        </div>
+
+        {/* Additional Tools */}
+        <div className="grid grid-cols-2 gap-4">
           <Button 
             variant="outline"
-            className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
+            className="h-20 flex items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
             onClick={() => navigate('/exclusion')}
           >
-            <Shield className="h-6 w-6" />
+            <Shield className="h-5 w-5" />
             <span className="text-sm font-medium">
               {addictionType === 'gambling' ? 'Blocking' : 'Outlet Blocking'}
             </span>
           </Button>
-        </div>
-
-        {/* AI Chat & Rebuild Life */}
-        <div className="grid grid-cols-1 gap-4">
           <Button 
             variant="outline"
-            className="h-20 flex items-center justify-center gap-3 hover:bg-accent/20 hover:border-accent/50 transition-all"
+            className="h-20 flex items-center justify-center gap-2 hover:bg-accent/20 hover:border-accent/50 transition-all"
             onClick={() => navigate('/ai-chat')}
           >
             <MessageSquare className="h-5 w-5" />
-            <span className="font-medium">24/7 AI Recovery Assistant</span>
-          </Button>
-          <Button 
-            variant="outline"
-            className="h-20 flex items-center justify-center gap-3 hover:bg-primary/10 hover:border-primary/50 transition-all"
-            onClick={() => navigate('/rebuild-life')}
-          >
-            <Sparkles className="h-5 w-5" />
-            <span className="font-medium">Rebuild My Life</span>
+            <span className="text-sm font-medium">AI Assistant</span>
           </Button>
         </div>
+
+        {/* Rebuild Life */}
+        <Button 
+          variant="outline"
+          className="h-20 flex items-center justify-center gap-3 hover:bg-primary/10 hover:border-primary/50 transition-all"
+          onClick={() => navigate('/rebuild-life')}
+        >
+          <Sparkles className="h-5 w-5" />
+          <span className="font-medium">Rebuild My Life</span>
+        </Button>
 
       </div>
       <BottomNav />
