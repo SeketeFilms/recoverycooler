@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Heart, MessageCircle, Send, Trash2 } from 'lucide-react';
+import { Heart, MessageCircle, Send, Trash2, Flag, Pin } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -30,6 +30,7 @@ interface Story {
   likes_count: number;
   comments_count: number;
   created_at: string;
+  pinned: boolean;
 }
 
 interface StoryDetailProps {
@@ -47,12 +48,30 @@ const StoryDetail = ({ story, open, onOpenChange, onUpdate }: StoryDetailProps) 
   const [loading, setLoading] = useState(false);
   const [deleteCommentId, setDeleteCommentId] = useState<string | null>(null);
   const [deleteStoryDialog, setDeleteStoryDialog] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDescription, setReportDescription] = useState('');
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     if (open && story) {
       loadComments();
+      checkUserRole();
     }
   }, [open, story]);
+
+  const checkUserRole = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .in('role', ['admin', 'moderator'])
+      .maybeSingle();
+    
+    setUserRole(data?.role || null);
+  };
 
   const loadComments = async () => {
     const { data, error } = await supabase
@@ -139,22 +158,85 @@ const StoryDetail = ({ story, open, onOpenChange, onUpdate }: StoryDetailProps) 
     }
   };
 
+  const handleTogglePin = async () => {
+    const { error } = await supabase
+      .from('success_stories')
+      .update({ pinned: !story.pinned })
+      .eq('id', story.id);
+
+    if (error) {
+      toast.error('Failed to update pin status');
+    } else {
+      toast.success(story.pinned ? 'Story unpinned' : 'Story pinned');
+      onUpdate();
+      onOpenChange(false);
+    }
+  };
+
+  const handleReport = async () => {
+    if (!user || !reportReason.trim()) {
+      toast.error('Please select a reason');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('content_reports')
+      .insert({
+        reporter_user_id: user.id,
+        content_type: 'success_story',
+        content_id: story.id,
+        reason: reportReason,
+        description: reportDescription,
+      });
+
+    if (error) {
+      toast.error('Failed to submit report');
+    } else {
+      toast.success('Report submitted. Thank you for keeping our community safe.');
+      setShowReportDialog(false);
+      setReportReason('');
+      setReportDescription('');
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start justify-between">
             <DialogTitle>{story.title}</DialogTitle>
-            {user?.id === story.user_id && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setDeleteStoryDialog(true)}
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {(userRole === 'admin' || userRole === 'moderator') && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleTogglePin}
+                  className="text-primary hover:text-primary"
+                >
+                  <Pin className={story.pinned ? "h-4 w-4 fill-primary" : "h-4 w-4"} />
+                </Button>
+              )}
+              {user?.id !== story.user_id && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowReportDialog(true)}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <Flag className="h-4 w-4" />
+                </Button>
+              )}
+              {user?.id === story.user_id && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDeleteStoryDialog(true)}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </DialogHeader>
         
@@ -279,6 +361,43 @@ const StoryDetail = ({ story, open, onOpenChange, onUpdate }: StoryDetailProps) 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Report Content</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Reason for report</Label>
+              <select
+                className="w-full p-2 border rounded-md bg-background"
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+              >
+                <option value="">Select a reason...</option>
+                <option value="spam">Spam or misleading</option>
+                <option value="harassment">Harassment or bullying</option>
+                <option value="inappropriate">Inappropriate content</option>
+                <option value="misinformation">Misinformation</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Additional details (optional)</Label>
+              <Textarea
+                placeholder="Provide more context about why you're reporting this..."
+                value={reportDescription}
+                onChange={(e) => setReportDescription(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <Button onClick={handleReport} className="w-full" disabled={!reportReason}>
+              Submit Report
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };
