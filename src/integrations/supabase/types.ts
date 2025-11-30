@@ -157,6 +157,45 @@ export type Database = {
         }
         Relationships: []
       }
+      content_reports: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          description: string | null
+          id: string
+          reason: string
+          reporter_user_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason: string
+          reporter_user_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason?: string
+          reporter_user_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       coping_strategies: {
         Row: {
           created_at: string
@@ -278,6 +317,7 @@ export type Database = {
           created_at: string
           id: string
           is_anonymous: boolean
+          pinned: boolean
           title: string
           user_id: string
         }
@@ -288,6 +328,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_anonymous?: boolean
+          pinned?: boolean
           title: string
           user_id: string
         }
@@ -298,6 +339,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_anonymous?: boolean
+          pinned?: boolean
           title?: string
           user_id?: string
         }
@@ -660,6 +702,7 @@ export type Database = {
           id: string
           is_anonymous: boolean
           likes_count: number
+          pinned: boolean
           title: string
           user_id: string
         }
@@ -671,6 +714,7 @@ export type Database = {
           id?: string
           is_anonymous?: boolean
           likes_count?: number
+          pinned?: boolean
           title: string
           user_id: string
         }
@@ -682,6 +726,7 @@ export type Database = {
           id?: string
           is_anonymous?: boolean
           likes_count?: number
+          pinned?: boolean
           title?: string
           user_id?: string
         }
@@ -751,6 +796,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_shortcuts: {
         Row: {
           created_at: string
@@ -780,10 +846,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -910,6 +982,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

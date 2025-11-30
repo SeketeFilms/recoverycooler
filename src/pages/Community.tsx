@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Heart, MessageCircle, Users, Award, Plus } from 'lucide-react';
+import { Heart, MessageCircle, Users, Award, Plus, Pin } from 'lucide-react';
 import { toast } from 'sonner';
 import BottomNav from '@/components/BottomNav';
 import StoryDetail from '@/components/StoryDetail';
@@ -26,6 +26,7 @@ interface SuccessStory {
   likes_count: number;
   comments_count: number;
   created_at: string;
+  pinned: boolean;
 }
 
 interface ForumPost {
@@ -37,6 +38,7 @@ interface ForumPost {
   is_anonymous: boolean;
   comments_count: number;
   created_at: string;
+  pinned: boolean;
 }
 
 const Community = () => {
@@ -97,6 +99,7 @@ const Community = () => {
       .from('success_stories')
       .select('*')
       .eq('addiction_type', addictionType)
+      .order('pinned', { ascending: false })
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -112,6 +115,7 @@ const Community = () => {
       .from('forum_posts')
       .select('*')
       .eq('addiction_type', addictionType)
+      .order('pinned', { ascending: false })
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -250,11 +254,14 @@ const Community = () => {
                   }}
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="text-xl font-semibold">{story.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {story.is_anonymous ? 'Anonymous' : 'Community Member'} • {format(new Date(story.created_at), 'MMM d, yyyy')}
-                      </p>
+                    <div className="flex items-center gap-2">
+                      {story.pinned && <Pin className="h-4 w-4 text-primary fill-primary" />}
+                      <div>
+                        <h3 className="text-xl font-semibold">{story.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {story.is_anonymous ? 'Anonymous' : 'Community Member'} • {format(new Date(story.created_at), 'MMM d, yyyy')}
+                        </p>
+                      </div>
                     </div>
                     <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
                       {story.addiction_type}
@@ -330,11 +337,14 @@ const Community = () => {
                   }}
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="text-xl font-semibold">{post.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {post.is_anonymous ? 'Anonymous' : 'Community Member'} • {format(new Date(post.created_at), 'MMM d, yyyy')}
-                      </p>
+                    <div className="flex items-center gap-2">
+                      {post.pinned && <Pin className="h-4 w-4 text-primary fill-primary" />}
+                      <div>
+                        <h3 className="text-xl font-semibold">{post.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {post.is_anonymous ? 'Anonymous' : 'Community Member'} • {format(new Date(post.created_at), 'MMM d, yyyy')}
+                        </p>
+                      </div>
                     </div>
                     <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
                       {post.addiction_type}
