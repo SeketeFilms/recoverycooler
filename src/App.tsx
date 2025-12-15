@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import SessionTracker from "./components/SessionTracker";
+import SwipeableLayout from "./components/SwipeableLayout";
 import Onboarding from "./pages/Onboarding";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
@@ -31,6 +32,13 @@ import Journal from "./pages/Journal";
 import Crisis from "./pages/Crisis";
 import NotFound from "./pages/NotFound";
 
+// Wrapper for swipeable main routes
+const SwipeableRoute = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute>
+    <SwipeableLayout>{children}</SwipeableLayout>
+  </ProtectedRoute>
+);
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -47,25 +55,25 @@ const App = () => (
             <Route
               path="/home"
               element={
-                <ProtectedRoute>
+                <SwipeableRoute>
                   <Home />
-                </ProtectedRoute>
+                </SwipeableRoute>
               }
             />
             <Route
               path="/cooldown"
               element={
-                <ProtectedRoute>
+                <SwipeableRoute>
                   <Cooldown />
-                </ProtectedRoute>
+                </SwipeableRoute>
               }
             />
             <Route
               path="/spending"
               element={
-                <ProtectedRoute>
+                <SwipeableRoute>
                   <Spending />
-                </ProtectedRoute>
+                </SwipeableRoute>
               }
             />
             <Route
@@ -79,9 +87,9 @@ const App = () => (
             <Route
               path="/profile"
               element={
-                <ProtectedRoute>
+                <SwipeableRoute>
                   <Profile />
-                </ProtectedRoute>
+                </SwipeableRoute>
               }
             />
             <Route
@@ -199,9 +207,9 @@ const App = () => (
             <Route
               path="/settings"
               element={
-                <ProtectedRoute>
+                <SwipeableRoute>
                   <Settings />
-                </ProtectedRoute>
+                </SwipeableRoute>
               }
             />
             <Route
