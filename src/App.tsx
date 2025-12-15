@@ -35,6 +35,11 @@ import Progress from "./pages/Progress";
 import Journal from "./pages/Journal";
 import Crisis from "./pages/Crisis";
 import NotFound from "./pages/NotFound";
+import Meditation from "./pages/Meditation";
+import AccountabilityPartners from "./pages/AccountabilityPartners";
+import DataExport from "./pages/DataExport";
+import Reports from "./pages/Reports";
+import LocationAlerts from "./pages/LocationAlerts";
 
 // Wrapper for swipeable main routes
 const SwipeableRoute = ({ children }: { children: React.ReactNode }) => (
@@ -229,6 +234,46 @@ const AppContent = () => {
           element={
             <ProtectedRoute>
               <ShortcutsSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/meditation"
+          element={
+            <ProtectedRoute>
+              <Meditation />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/partners"
+          element={
+            <ProtectedRoute>
+              <AccountabilityPartners />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/export"
+          element={
+            <ProtectedRoute>
+              <DataExport />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <Reports />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/location-alerts"
+          element={
+            <ProtectedRoute>
+              <LocationAlerts />
             </ProtectedRoute>
           }
         />

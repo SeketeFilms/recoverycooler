@@ -142,6 +142,30 @@ const Home = () => {
       label: 'Help Resources',
       path: '/help',
       color: 'text-primary'
+    },
+    meditation: {
+      icon: Sparkles,
+      label: 'Meditation',
+      path: '/meditation',
+      color: 'text-accent'
+    },
+    partners: {
+      icon: MessageSquare,
+      label: 'Partners',
+      path: '/partners',
+      color: 'text-primary'
+    },
+    reports: {
+      icon: Sparkles,
+      label: 'Reports',
+      path: '/reports',
+      color: 'text-primary'
+    },
+    locations: {
+      icon: AlertCircle,
+      label: 'Location Alerts',
+      path: '/location-alerts',
+      color: 'text-destructive'
     }
   };
 
