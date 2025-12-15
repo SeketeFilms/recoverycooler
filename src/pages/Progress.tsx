@@ -162,6 +162,27 @@ const Progress = () => {
       toast.success(`🏆 Achievement Unlocked: ${achievement.name}!`);
     }
 
+    // Check for streak milestones and send email notifications
+    const milestones = [7, 14, 30, 60, 90, 180, 365];
+    const hitMilestone = milestones.find(m => streak === m);
+    
+    if (hitMilestone) {
+      try {
+        const milestoneAchievement = newAchievements.find(a => 
+          a.requirement_type === 'streak_days' && a.requirement_value === hitMilestone
+        );
+        
+        await supabase.functions.invoke('send-streak-notification', {
+          body: {
+            milestone: hitMilestone,
+            achievementName: milestoneAchievement?.name,
+          },
+        });
+      } catch (error) {
+        console.error('Failed to send streak notification:', error);
+      }
+    }
+
     if (newAchievements.length > 0) {
       loadAchievements();
     }

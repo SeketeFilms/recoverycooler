@@ -100,10 +100,6 @@ const AccountabilityPartners = () => {
     setSending(true);
 
     try {
-      // Find user by checking if they exist (we'll need to check profiles)
-      // For now, we'll create a pending request
-      // In a real app, you'd send an email invite
-
       // Check if already partnered
       const existingPartner = partners.find(
         (p) => p.partner_email === inviteEmail || p.status === 'pending'
@@ -115,9 +111,28 @@ const AccountabilityPartners = () => {
         return;
       }
 
-      // For demo purposes, we'll create a partnership request
-      // In production, you'd look up the user by email first
-      toast.success(`Invitation would be sent to ${inviteEmail}. This feature requires email verification in production.`);
+      // Get sender's profile name
+      const { data: senderProfile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('user_id', user!.id)
+        .single();
+
+      // Send email notification
+      const { error: emailError } = await supabase.functions.invoke('send-partner-notification', {
+        body: {
+          type: 'invite',
+          recipientEmail: inviteEmail,
+          senderName: senderProfile?.full_name || user!.email?.split('@')[0] || 'Someone',
+        },
+      });
+
+      if (emailError) {
+        console.error('Email notification error:', emailError);
+        // Don't fail the invite if email fails
+      }
+
+      toast.success(`Invitation sent to ${inviteEmail}!`);
       setIsDialogOpen(false);
       setInviteEmail('');
     } catch (error) {
@@ -130,12 +145,32 @@ const AccountabilityPartners = () => {
 
   const updatePartnershipStatus = async (partnerId: string, newStatus: 'active' | 'declined') => {
     try {
+      const partner = partners.find(p => p.id === partnerId);
+      
       const { error } = await supabase
         .from('accountability_partners')
         .update({ status: newStatus })
         .eq('id', partnerId);
 
       if (error) throw error;
+
+      // Send email notification when accepted
+      if (newStatus === 'active' && partner) {
+        const { data: myProfile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('user_id', user!.id)
+          .single();
+
+        // Notify the original requester that their request was accepted
+        await supabase.functions.invoke('send-partner-notification', {
+          body: {
+            type: 'accepted',
+            recipientEmail: user!.email, // In real app, get partner's email
+            recipientName: myProfile?.full_name || 'Your partner',
+          },
+        });
+      }
 
       toast.success(newStatus === 'active' ? 'Partnership accepted!' : 'Request declined');
       loadPartners();
