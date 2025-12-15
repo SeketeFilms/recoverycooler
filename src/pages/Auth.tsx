@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldAlert, ShieldCheck, Shield } from 'lucide-react';
 import { z } from 'zod';
+import { Progress } from '@/components/ui/progress';
 
 // HTML entity encoding to prevent XSS in emails
 function escapeHtml(unsafe: string): string {
@@ -18,6 +19,87 @@ function escapeHtml(unsafe: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+// Rate limiting configuration
+const RATE_LIMIT_KEY = 'auth_rate_limit';
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+
+interface RateLimitData {
+  attempts: number;
+  lastAttempt: number;
+  lockedUntil: number | null;
+}
+
+function getRateLimitData(): RateLimitData {
+  try {
+    const data = localStorage.getItem(RATE_LIMIT_KEY);
+    if (data) {
+      return JSON.parse(data);
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return { attempts: 0, lastAttempt: 0, lockedUntil: null };
+}
+
+function setRateLimitData(data: RateLimitData): void {
+  localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
+}
+
+function checkRateLimit(): { allowed: boolean; remainingTime?: number } {
+  const data = getRateLimitData();
+  const now = Date.now();
+  
+  // Check if locked out
+  if (data.lockedUntil && now < data.lockedUntil) {
+    return { allowed: false, remainingTime: Math.ceil((data.lockedUntil - now) / 1000 / 60) };
+  }
+  
+  // Reset if lockout has expired
+  if (data.lockedUntil && now >= data.lockedUntil) {
+    setRateLimitData({ attempts: 0, lastAttempt: 0, lockedUntil: null });
+    return { allowed: true };
+  }
+  
+  return { allowed: true };
+}
+
+function recordFailedAttempt(): void {
+  const data = getRateLimitData();
+  const now = Date.now();
+  
+  data.attempts += 1;
+  data.lastAttempt = now;
+  
+  if (data.attempts >= MAX_ATTEMPTS) {
+    data.lockedUntil = now + LOCKOUT_DURATION_MS;
+  }
+  
+  setRateLimitData(data);
+}
+
+function resetRateLimit(): void {
+  localStorage.removeItem(RATE_LIMIT_KEY);
+}
+
+// Password strength calculation
+function calculatePasswordStrength(password: string): { score: number; label: string; color: string } {
+  let score = 0;
+  
+  if (password.length >= 8) score += 20;
+  if (password.length >= 12) score += 10;
+  if (password.length >= 16) score += 10;
+  if (/[a-z]/.test(password)) score += 15;
+  if (/[A-Z]/.test(password)) score += 15;
+  if (/[0-9]/.test(password)) score += 15;
+  if (/[^a-zA-Z0-9]/.test(password)) score += 15;
+  
+  if (score < 40) return { score, label: 'Weak', color: 'bg-destructive' };
+  if (score < 70) return { score, label: 'Fair', color: 'bg-yellow-500' };
+  if (score < 90) return { score, label: 'Good', color: 'bg-blue-500' };
+  return { score, label: 'Strong', color: 'bg-green-500' };
 }
 
 const authSchema = z.object({
@@ -49,6 +131,9 @@ const Auth = () => {
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
+  const passwordStrength = useMemo(() => calculatePasswordStrength(password), [password]);
+  const rateLimitData = getRateLimitData();
+
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -78,6 +163,16 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check rate limit for sign-in
+    if (!isSignUp) {
+      const rateCheck = checkRateLimit();
+      if (!rateCheck.allowed) {
+        toast.error(`Too many failed attempts. Please try again in ${rateCheck.remainingTime} minutes.`);
+        return;
+      }
+    }
+    
     setLoading(true);
 
     try {
@@ -163,11 +258,16 @@ const Auth = () => {
           console.error('Error sending welcome email:', emailError);
         }
         
+        resetRateLimit(); // Clear rate limit on successful signup
         toast.success('Account created! Welcome to RecoveryCooler');
         navigate('/home');
       } else {
         const { error } = await signIn(email, password);
-        if (error) throw error;
+        if (error) {
+          recordFailedAttempt();
+          throw error;
+        }
+        resetRateLimit(); // Clear rate limit on successful login
         toast.success('Welcome back!');
         navigate('/home');
       }
@@ -177,6 +277,14 @@ const Auth = () => {
       // Handle specific database errors
       if (errorMessage.includes('duplicate key') || errorMessage.includes('Database error')) {
         toast.error('This username is already taken. Please choose a different one.');
+      } else if (errorMessage.includes('Invalid login credentials')) {
+        const data = getRateLimitData();
+        const remaining = MAX_ATTEMPTS - data.attempts;
+        if (remaining > 0) {
+          toast.error(`Invalid credentials. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining before lockout.`);
+        } else {
+          toast.error('Account temporarily locked due to too many failed attempts.');
+        }
       } else {
         toast.error(errorMessage);
       }
@@ -296,9 +404,46 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  minLength={6}
+                  minLength={8}
                 />
+                {isSignUp && password.length > 0 && (
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-center gap-2">
+                      <Progress value={passwordStrength.score} className="h-2 flex-1" />
+                      <span className={`text-xs font-medium ${
+                        passwordStrength.score < 40 ? 'text-destructive' : 
+                        passwordStrength.score < 70 ? 'text-yellow-600' :
+                        passwordStrength.score < 90 ? 'text-blue-600' : 'text-green-600'
+                      }`}>
+                        {passwordStrength.label}
+                      </span>
+                    </div>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li className={password.length >= 8 ? 'text-green-600' : ''}>
+                        {password.length >= 8 ? '✓' : '○'} At least 8 characters
+                      </li>
+                      <li className={/[A-Z]/.test(password) ? 'text-green-600' : ''}>
+                        {/[A-Z]/.test(password) ? '✓' : '○'} One uppercase letter
+                      </li>
+                      <li className={/[a-z]/.test(password) ? 'text-green-600' : ''}>
+                        {/[a-z]/.test(password) ? '✓' : '○'} One lowercase letter
+                      </li>
+                      <li className={/[0-9]/.test(password) ? 'text-green-600' : ''}>
+                        {/[0-9]/.test(password) ? '✓' : '○'} One number
+                      </li>
+                      <li className={/[^a-zA-Z0-9]/.test(password) ? 'text-green-600' : ''}>
+                        {/[^a-zA-Z0-9]/.test(password) ? '✓' : '○'} One special character (optional)
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
+              {!isSignUp && rateLimitData.lockedUntil && Date.now() < rateLimitData.lockedUntil && (
+                <div className="flex items-center gap-2 p-3 rounded-md bg-destructive/10 text-destructive text-sm">
+                  <ShieldAlert className="h-4 w-4" />
+                  <span>Account locked. Try again in {Math.ceil((rateLimitData.lockedUntil - Date.now()) / 1000 / 60)} minutes.</span>
+                </div>
+              )}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isSignUp ? 'Create Account' : 'Sign In'}
