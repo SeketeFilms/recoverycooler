@@ -14,7 +14,7 @@ import {
   LogOut,
   MessageSquare
 } from 'lucide-react';
-import BottomNav from '@/components/BottomNav';
+
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -147,7 +147,7 @@ const Settings = () => {
           </Card>
         </div>
       </div>
-      <BottomNav />
+      
     </div>
   );
 };
