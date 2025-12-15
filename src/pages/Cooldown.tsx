@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Play, Pause, RotateCcw, Volume2, VolumeX, WifiOff } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import BottomNav from '@/components/BottomNav';
+
 import OfflineIndicator from '@/components/OfflineIndicator';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
@@ -222,7 +222,7 @@ const Cooldown = () => {
           </CardContent>
         </Card>
       </div>
-      <BottomNav />
+      
     </div>
   );
 };

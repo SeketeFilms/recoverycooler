@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
 import { useTheme } from 'next-themes';
-import BottomNav from '@/components/BottomNav';
+
 
 const profileSchema = z.object({
   fullName: z.string().trim().max(100, 'Name too long'),
@@ -420,7 +420,7 @@ const Profile = () => {
           </AlertDialog>
         </div>
       </div>
-      <BottomNav />
+      
     </div>
   );
 };

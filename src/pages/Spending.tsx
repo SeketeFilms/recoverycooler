@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { TrendingDown, Plus, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
-import BottomNav from '@/components/BottomNav';
+
 import {
   Dialog,
   DialogContent,
@@ -276,7 +276,7 @@ const Spending = () => {
           </DialogContent>
         </Dialog>
       </div>
-      <BottomNav />
+      
     </div>
   );
 };

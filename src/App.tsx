@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import BottomNav from "./components/BottomNav";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import SessionTracker from "./components/SessionTracker";
@@ -47,6 +48,15 @@ const SwipeableRoute = ({ children }: { children: React.ReactNode }) => (
     <SwipeableLayout>{children}</SwipeableLayout>
   </ProtectedRoute>
 );
+
+const MAIN_ROUTES = ['/home', '/cooldown', '/spending', '/profile', '/settings'];
+
+// Bottom nav shown only on main routes
+const MainRouteBottomNav = () => {
+  const location = useLocation();
+  const isMainRoute = MAIN_ROUTES.includes(location.pathname);
+  return isMainRoute ? <BottomNav /> : null;
+};
 
 // App content with offline handling
 const AppContent = () => {
@@ -279,6 +289,7 @@ const AppContent = () => {
         />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <MainRouteBottomNav />
     </>
   );
 };
