@@ -1,10 +1,17 @@
 import { Home, AlertCircle, DollarSign, User, Settings } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { trigger } = useHapticFeedback();
+
+  const handleNavClick = (path: string) => {
+    trigger('medium');
+    navigate(path);
+  };
 
   const navItems = [
     { icon: Home, label: 'Home', path: '/home' },
@@ -25,7 +32,7 @@ const BottomNav = () => {
             return (
               <button
                 key={item.path}
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavClick(item.path)}
                 className={cn(
                   "flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-xl transition-all duration-300 min-w-[60px]",
                   isActive 
