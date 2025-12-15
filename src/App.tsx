@@ -12,6 +12,7 @@ import OfflineIndicator from "./components/OfflineIndicator";
 import OfflineAssistance from "./components/OfflineAssistance";
 import { useOnlineStatus } from "./hooks/useOnlineStatus";
 import { useOfflineCache } from "./hooks/useOfflineCache";
+import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
@@ -77,8 +78,9 @@ const AppContent = () => {
     <>
       <OfflineIndicator />
       <Routes>
-        <Route path="/" element={<Onboarding />} />
+        <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route
           path="/home"
           element={
