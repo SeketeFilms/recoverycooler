@@ -20,3 +20,9 @@ verify_jwt = true
 
 [functions.ai-recovery-chat]
 verify_jwt = true
+
+[functions.send-partner-notification]
+verify_jwt = true
+
+[functions.send-streak-notification]
+verify_jwt = true
