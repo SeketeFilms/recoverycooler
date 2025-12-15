@@ -64,6 +64,20 @@ const Settings = () => {
       color: 'text-accent',
     },
     {
+      icon: Users,
+      title: 'Accountability Partners',
+      description: 'Connect with support partners',
+      path: '/partners',
+      color: 'text-primary',
+    },
+    {
+      icon: TrendingUp,
+      title: 'Weekly Reports',
+      description: 'View progress reports',
+      path: '/reports',
+      color: 'text-primary',
+    },
+    {
       icon: HelpCircle,
       title: 'Help & Resources',
       description: 'Get support and information',
