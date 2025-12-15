@@ -7,6 +7,10 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import SessionTracker from "./components/SessionTracker";
 import SwipeableLayout from "./components/SwipeableLayout";
+import OfflineIndicator from "./components/OfflineIndicator";
+import OfflineAssistance from "./components/OfflineAssistance";
+import { useOnlineStatus } from "./hooks/useOnlineStatus";
+import { useOfflineCache } from "./hooks/useOfflineCache";
 import Onboarding from "./pages/Onboarding";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
@@ -39,6 +43,201 @@ const SwipeableRoute = ({ children }: { children: React.ReactNode }) => (
   </ProtectedRoute>
 );
 
+// App content with offline handling
+const AppContent = () => {
+  const isOnline = useOnlineStatus();
+  useOfflineCache();
+
+  // Show offline assistance when offline and logged in
+  if (!isOnline) {
+    return (
+      <>
+        <OfflineIndicator />
+        <OfflineAssistance />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <OfflineIndicator />
+      <Routes>
+        <Route path="/" element={<Onboarding />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route
+          path="/home"
+          element={
+            <SwipeableRoute>
+              <Home />
+            </SwipeableRoute>
+          }
+        />
+        <Route
+          path="/cooldown"
+          element={
+            <SwipeableRoute>
+              <Cooldown />
+            </SwipeableRoute>
+          }
+        />
+        <Route
+          path="/spending"
+          element={
+            <SwipeableRoute>
+              <Spending />
+            </SwipeableRoute>
+          }
+        />
+        <Route
+          path="/exclusion"
+          element={
+            <ProtectedRoute>
+              <Exclusion />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <SwipeableRoute>
+              <Profile />
+            </SwipeableRoute>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <ProtectedRoute>
+              <Help />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/security"
+          element={
+            <ProtectedRoute>
+              <Security />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ai-chat"
+          element={
+            <ProtectedRoute>
+              <AIChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rebuild-life"
+          element={
+            <ProtectedRoute>
+              <RebuildLife />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rebuild-life/finance"
+          element={
+            <ProtectedRoute>
+              <FinanceRecovery />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rebuild-life/relationships"
+          element={
+            <ProtectedRoute>
+              <RelationshipHealing />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rebuild-life/habits"
+          element={
+            <ProtectedRoute>
+              <BuildNewHabits />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rebuild-life/goals"
+          element={
+            <ProtectedRoute>
+              <SetFutureGoals />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rebuild-life/mental-health"
+          element={
+            <ProtectedRoute>
+              <MentalHealthSupport />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/progress"
+          element={
+            <ProtectedRoute>
+              <Progress />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/journal"
+          element={
+            <ProtectedRoute>
+              <Journal />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/crisis"
+          element={
+            <ProtectedRoute>
+              <Crisis />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/community"
+          element={
+            <ProtectedRoute>
+              <Community />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/relapse-prevention"
+          element={
+            <ProtectedRoute>
+              <RelapsePrevention />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <SwipeableRoute>
+              <Settings />
+            </SwipeableRoute>
+          }
+        />
+        <Route
+          path="/settings/shortcuts"
+          element={
+            <ProtectedRoute>
+              <ShortcutsSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -49,179 +248,7 @@ const App = () => (
         <Sonner />
         <SessionTracker />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Onboarding />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route
-              path="/home"
-              element={
-                <SwipeableRoute>
-                  <Home />
-                </SwipeableRoute>
-              }
-            />
-            <Route
-              path="/cooldown"
-              element={
-                <SwipeableRoute>
-                  <Cooldown />
-                </SwipeableRoute>
-              }
-            />
-            <Route
-              path="/spending"
-              element={
-                <SwipeableRoute>
-                  <Spending />
-                </SwipeableRoute>
-              }
-            />
-            <Route
-              path="/exclusion"
-              element={
-                <ProtectedRoute>
-                  <Exclusion />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <SwipeableRoute>
-                  <Profile />
-                </SwipeableRoute>
-              }
-            />
-            <Route
-              path="/help"
-              element={
-                <ProtectedRoute>
-                  <Help />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/security"
-              element={
-                <ProtectedRoute>
-                  <Security />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/ai-chat"
-              element={
-                <ProtectedRoute>
-                  <AIChatPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/rebuild-life"
-              element={
-                <ProtectedRoute>
-                  <RebuildLife />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/rebuild-life/finance"
-              element={
-                <ProtectedRoute>
-                  <FinanceRecovery />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/rebuild-life/relationships"
-              element={
-                <ProtectedRoute>
-                  <RelationshipHealing />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/rebuild-life/habits"
-              element={
-                <ProtectedRoute>
-                  <BuildNewHabits />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/rebuild-life/goals"
-              element={
-                <ProtectedRoute>
-                  <SetFutureGoals />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/rebuild-life/mental-health"
-              element={
-                <ProtectedRoute>
-                  <MentalHealthSupport />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/progress"
-              element={
-                <ProtectedRoute>
-                  <Progress />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/journal"
-              element={
-                <ProtectedRoute>
-                  <Journal />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crisis"
-              element={
-                <ProtectedRoute>
-                  <Crisis />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/community"
-              element={
-                <ProtectedRoute>
-                  <Community />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/relapse-prevention"
-              element={
-                <ProtectedRoute>
-                  <RelapsePrevention />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <SwipeableRoute>
-                  <Settings />
-                </SwipeableRoute>
-              }
-            />
-            <Route
-              path="/settings/shortcuts"
-              element={
-                <ProtectedRoute>
-                  <ShortcutsSettings />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
