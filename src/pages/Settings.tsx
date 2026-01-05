@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { 
   TrendingUp, 
   BookOpen, 
@@ -12,13 +13,33 @@ import {
   Lock,
   ChevronRight,
   LogOut,
-  MessageSquare
+  MessageSquare,
+  Fingerprint,
+  Bell,
+  Coffee,
+  Heart
 } from 'lucide-react';
-
+import { useBiometricAuth } from '@/hooks/useBiometricAuth';
+import { useNativePushNotifications } from '@/hooks/useNativePushNotifications';
+import { toast } from '@/hooks/use-toast';
+import { Capacitor } from '@capacitor/core';
 
 const Settings = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { 
+    isAvailable: biometricAvailable, 
+    isEnabled: biometricEnabled, 
+    enableBiometric, 
+    disableBiometric,
+    getBiometryLabel 
+  } = useBiometricAuth();
+  const { 
+    isSupported: pushSupported, 
+    isRegistered: pushRegistered, 
+    permissionStatus,
+    requestPermission: requestPushPermission 
+  } = useNativePushNotifications();
 
   const menuItems = [
     {
@@ -98,6 +119,54 @@ const Settings = () => {
     navigate('/auth');
   };
 
+  const handleBiometricToggle = async (enabled: boolean) => {
+    if (enabled) {
+      const success = await enableBiometric();
+      if (success) {
+        toast({
+          title: 'Biometric Enabled',
+          description: `${getBiometryLabel()} authentication is now active`,
+        });
+      } else {
+        toast({
+          title: 'Authentication Failed',
+          description: 'Could not enable biometric authentication',
+          variant: 'destructive',
+        });
+      }
+    } else {
+      disableBiometric();
+      toast({
+        title: 'Biometric Disabled',
+        description: 'Biometric authentication has been turned off',
+      });
+    }
+  };
+
+  const handlePushToggle = async () => {
+    if (!pushRegistered) {
+      const success = await requestPushPermission();
+      if (success) {
+        toast({
+          title: 'Notifications Enabled',
+          description: 'You will now receive push notifications',
+        });
+      } else {
+        toast({
+          title: 'Permission Denied',
+          description: 'Please enable notifications in your device settings',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  const handleBuyMeCoffee = () => {
+    window.open('https://www.paypal.com/paypalme/Seketefilmstv', '_blank');
+  };
+
+  const isNative = Capacitor.isNativePlatform();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 pb-32">
       <div className="container max-w-4xl mx-auto p-6">
@@ -109,6 +178,55 @@ const Settings = () => {
             <p className="text-muted-foreground mt-2">Manage your recovery tools</p>
           </div>
         </div>
+
+        {/* Native Features Section */}
+        {isNative && (
+          <div className="mb-6 space-y-3">
+            <h2 className="text-lg font-semibold text-muted-foreground mb-3">App Security & Notifications</h2>
+            
+            {biometricAvailable && (
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-full bg-muted">
+                      <Fingerprint className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">{getBiometryLabel()} Lock</h3>
+                      <p className="text-sm text-muted-foreground">Secure app with biometrics</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={biometricEnabled}
+                    onCheckedChange={handleBiometricToggle}
+                  />
+                </div>
+              </Card>
+            )}
+
+            {pushSupported && (
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-full bg-muted">
+                      <Bell className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Push Notifications</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {pushRegistered ? 'Notifications enabled' : 'Enable recovery reminders'}
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={pushRegistered || permissionStatus === 'granted'}
+                    onCheckedChange={handlePushToggle}
+                  />
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
 
         <div className="space-y-3">
           {menuItems.map((item) => {
@@ -135,6 +253,28 @@ const Settings = () => {
             );
           })}
 
+          {/* Buy Me Coffee Section */}
+          <Card 
+            className="p-4 mt-6 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30 hover:shadow-lg transition-all cursor-pointer"
+            onClick={handleBuyMeCoffee}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-amber-500/20">
+                  <Coffee className="h-6 w-6 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold flex items-center gap-2">
+                    Buy Me a Coffee
+                    <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                  </h3>
+                  <p className="text-sm text-muted-foreground">Support the developer via PayPal</p>
+                </div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </div>
+          </Card>
+
           <Card className="p-4 mt-8 border-destructive/20">
             <Button
               variant="ghost"
@@ -146,8 +286,14 @@ const Settings = () => {
             </Button>
           </Card>
         </div>
+
+        {/* App Attribution */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            App by <span className="font-semibold text-primary">Sekete Films Production</span>
+          </p>
+        </div>
       </div>
-      
     </div>
   );
 };
