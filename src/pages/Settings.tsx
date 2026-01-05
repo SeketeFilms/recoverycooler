@@ -162,7 +162,7 @@ const Settings = () => {
   };
 
   const handleBuyMeCoffee = () => {
-    window.open('https://www.paypal.com/paypalme/Seketefilmstv', '_blank');
+    window.open('https://www.paypal.com/ncp/payment/PW92XP4Y58LJN', '_blank');
   };
 
   const isNative = Capacitor.isNativePlatform();
