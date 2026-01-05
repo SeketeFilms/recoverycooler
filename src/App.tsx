@@ -10,6 +10,7 @@ import SessionTracker from "./components/SessionTracker";
 import SwipeableLayout from "./components/SwipeableLayout";
 import OfflineIndicator from "./components/OfflineIndicator";
 import OfflineAssistance from "./components/OfflineAssistance";
+import BiometricGate from "./components/BiometricGate";
 import { useOnlineStatus } from "./hooks/useOnlineStatus";
 import { useOfflineCache } from "./hooks/useOfflineCache";
 import Index from "./pages/Index";
@@ -306,7 +307,9 @@ const App = () => (
         <Sonner />
         <SessionTracker />
         <BrowserRouter>
-          <AppContent />
+          <BiometricGate>
+            <AppContent />
+          </BiometricGate>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
