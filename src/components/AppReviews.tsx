@@ -4,16 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Star, MessageSquare, Send } from 'lucide-react';
+import { Star, MessageSquare, Send, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-
-interface ReviewProfile {
-  username: string | null;
-  full_name: string | null;
-}
 
 interface Review {
   id: string;
@@ -30,16 +24,14 @@ const AppReviews = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
-  const [isAnonymous, setIsAnonymous] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [userReview, setUserReview] = useState<Review | null>(null);
 
   useEffect(() => {
     loadReviews();
     
-    // Set up realtime subscription
     const channel = supabase
       .channel('app-reviews')
       .on(
@@ -61,7 +53,6 @@ const AppReviews = () => {
   }, [user]);
 
   const loadReviews = async () => {
-    // Fetch reviews
     const { data: reviewsData, error: reviewsError } = await supabase
       .from('app_reviews')
       .select('*')
@@ -73,18 +64,15 @@ const AppReviews = () => {
       return;
     }
 
-    // Fetch profiles for non-anonymous reviews
-    const nonAnonymousUserIds = reviewsData
-      .filter(r => !r.is_anonymous)
-      .map(r => r.user_id);
-
+    // Fetch profiles for all reviews to show real names
+    const allUserIds = reviewsData.map(r => r.user_id);
     let profilesMap: Record<string, string> = {};
     
-    if (nonAnonymousUserIds.length > 0) {
+    if (allUserIds.length > 0) {
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('user_id, username, full_name')
-        .in('user_id', nonAnonymousUserIds);
+        .in('user_id', allUserIds);
 
       if (profilesData) {
         profilesData.forEach((profile) => {
@@ -96,10 +84,9 @@ const AppReviews = () => {
       }
     }
 
-    // Merge profile names into reviews
     const reviewsWithNames = reviewsData.map(review => ({
       ...review,
-      profile_name: review.is_anonymous ? undefined : profilesMap[review.user_id]
+      profile_name: profilesMap[review.user_id]
     }));
 
     setReviews(reviewsWithNames);
@@ -116,16 +103,20 @@ const AppReviews = () => {
       return;
     }
 
+    if (rating === 0) {
+      toast.error('Please select a rating');
+      return;
+    }
+
     setSubmitting(true);
     
     if (userReview) {
-      // Update existing review
       const { error } = await supabase
         .from('app_reviews')
         .update({
           rating,
           review_text: reviewText || null,
-          is_anonymous: isAnonymous
+          is_anonymous: false
         })
         .eq('id', userReview.id);
 
@@ -136,14 +127,13 @@ const AppReviews = () => {
         setShowForm(false);
       }
     } else {
-      // Create new review
       const { error } = await supabase
         .from('app_reviews')
         .insert({
           user_id: user.id,
           rating,
           review_text: reviewText || null,
-          is_anonymous: isAnonymous
+          is_anonymous: false
         });
 
       if (error) {
@@ -152,18 +142,39 @@ const AppReviews = () => {
         toast.success('Thank you for your review!');
         setShowForm(false);
         setReviewText('');
-        setRating(5);
+        setRating(0);
       }
     }
     
     setSubmitting(false);
   };
 
+  const handleDelete = async () => {
+    if (!user || !userReview) return;
+
+    const { error } = await supabase
+      .from('app_reviews')
+      .delete()
+      .eq('id', userReview.id);
+
+    if (error) {
+      toast.error('Failed to delete review');
+    } else {
+      toast.success('Review deleted');
+      setUserReview(null);
+      setShowForm(false);
+      setRating(0);
+      setReviewText('');
+    }
+  };
+
   const openEditForm = () => {
     if (userReview) {
       setRating(userReview.rating);
       setReviewText(userReview.review_text || '');
-      setIsAnonymous(userReview.is_anonymous);
+    } else {
+      setRating(0);
+      setReviewText('');
     }
     setShowForm(true);
   };
@@ -203,7 +214,7 @@ const AppReviews = () => {
         {showForm && (
           <div className="space-y-4 p-4 bg-card rounded-lg border">
             <div className="space-y-2">
-              <Label>Rating</Label>
+              <Label>Rating <span className="text-destructive">*</span></Label>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -222,6 +233,9 @@ const AppReviews = () => {
                   </button>
                 ))}
               </div>
+              {rating === 0 && (
+                <p className="text-xs text-muted-foreground">Tap a star to rate</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -232,15 +246,6 @@ const AppReviews = () => {
                 onChange={(e) => setReviewText(e.target.value)}
                 rows={3}
               />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Switch
-                id="anonymous"
-                checked={isAnonymous}
-                onCheckedChange={setIsAnonymous}
-              />
-              <Label htmlFor="anonymous" className="text-sm">Post anonymously</Label>
             </div>
 
             <div className="flex gap-2">
@@ -254,12 +259,23 @@ const AppReviews = () => {
               <Button
                 className="flex-1"
                 onClick={handleSubmit}
-                disabled={submitting}
+                disabled={submitting || rating === 0}
               >
                 <Send className="w-4 h-4 mr-2" />
                 {submitting ? 'Submitting...' : userReview ? 'Update' : 'Submit'}
               </Button>
             </div>
+
+            {userReview && (
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={handleDelete}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete My Review
+              </Button>
+            )}
           </div>
         )}
 
@@ -296,9 +312,7 @@ const AppReviews = () => {
                   <p className="text-sm">{review.review_text}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  {review.is_anonymous 
-                    ? 'Anonymous' 
-                    : review.profile_name || `User ${review.user_id.slice(0, 8)}`}
+                  {review.profile_name || `User ${review.user_id.slice(0, 8)}`}
                 </p>
               </div>
             ))}
