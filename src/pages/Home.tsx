@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, DollarSign, Shield, HelpCircle, LogOut, MessageSquare, AlertCircle } from 'lucide-react';
 
-import InstallPrompt from '@/components/InstallPrompt';
-
 const motivationalQuotes = {
   gambling: [
     "You are stronger than the urge. Pause and breathe.",
@@ -300,8 +298,6 @@ const Home = () => {
         </Button>
 
       </div>
-      
-      <InstallPrompt />
     </div>
   );
 };
