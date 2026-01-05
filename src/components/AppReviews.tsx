@@ -10,6 +10,11 @@ import { Star, MessageSquare, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
+interface ReviewProfile {
+  username: string | null;
+  full_name: string | null;
+}
+
 interface Review {
   id: string;
   user_id: string;
@@ -17,6 +22,7 @@ interface Review {
   review_text: string | null;
   is_anonymous: boolean;
   created_at: string;
+  profile_name?: string;
 }
 
 const AppReviews = () => {
@@ -55,18 +61,51 @@ const AppReviews = () => {
   }, [user]);
 
   const loadReviews = async () => {
-    const { data, error } = await supabase
+    // Fetch reviews
+    const { data: reviewsData, error: reviewsError } = await supabase
       .from('app_reviews')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(10);
 
-    if (!error && data) {
-      setReviews(data);
-      if (user) {
-        const existing = data.find(r => r.user_id === user.id);
-        setUserReview(existing || null);
+    if (reviewsError || !reviewsData) {
+      setLoading(false);
+      return;
+    }
+
+    // Fetch profiles for non-anonymous reviews
+    const nonAnonymousUserIds = reviewsData
+      .filter(r => !r.is_anonymous)
+      .map(r => r.user_id);
+
+    let profilesMap: Record<string, string> = {};
+    
+    if (nonAnonymousUserIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, username, full_name')
+        .in('user_id', nonAnonymousUserIds);
+
+      if (profilesData) {
+        profilesData.forEach((profile) => {
+          const displayName = profile.username || profile.full_name || null;
+          if (displayName) {
+            profilesMap[profile.user_id] = displayName;
+          }
+        });
       }
+    }
+
+    // Merge profile names into reviews
+    const reviewsWithNames = reviewsData.map(review => ({
+      ...review,
+      profile_name: review.is_anonymous ? undefined : profilesMap[review.user_id]
+    }));
+
+    setReviews(reviewsWithNames);
+    if (user) {
+      const existing = reviewsWithNames.find(r => r.user_id === user.id);
+      setUserReview(existing || null);
     }
     setLoading(false);
   };
@@ -257,7 +296,9 @@ const AppReviews = () => {
                   <p className="text-sm">{review.review_text}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  {review.is_anonymous ? 'Anonymous' : `User ${review.user_id.slice(0, 8)}`}
+                  {review.is_anonymous 
+                    ? 'Anonymous' 
+                    : review.profile_name || `User ${review.user_id.slice(0, 8)}`}
                 </p>
               </div>
             ))}
