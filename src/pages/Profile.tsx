@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { User, LogOut, Save, Moon, Sun, Edit, Camera, Trash2, Shield } from 'lucide-react';
+import { User, LogOut, Save, Moon, Sun, Edit, Camera, Trash2, Shield, UserCircle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
@@ -122,6 +122,55 @@ const Profile = () => {
     }
   };
 
+  const handleRemovePhoto = async () => {
+    if (!user || !avatarUrl) return;
+
+    setUploading(true);
+
+    try {
+      // Delete avatar from storage
+      const oldPath = avatarUrl.split('/').slice(-2).join('/');
+      await supabase.storage.from('avatars').remove([oldPath]);
+
+      // Update profile to remove avatar_url
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl('');
+      toast.success('Profile picture removed!');
+    } catch (error) {
+      toast.error('Failed to remove profile picture');
+      console.error(error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Get gender-based icon
+  const getGenderIcon = () => {
+    const lowerGender = gender.toLowerCase();
+    if (lowerGender === 'male' || lowerGender === 'm') {
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16 text-blue-500">
+          <circle cx="12" cy="8" r="5" />
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        </svg>
+      );
+    } else if (lowerGender === 'female' || lowerGender === 'f') {
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16 text-pink-500">
+          <circle cx="12" cy="8" r="5" />
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        </svg>
+      );
+    }
+    return <UserCircle className="w-16 h-16 text-muted-foreground" />;
+  };
+
   const handleSaveProfile = async () => {
     if (!user) return;
     setLoading(true);
@@ -216,12 +265,12 @@ const Profile = () => {
 
         <Card className="gentle-fade-in shadow-xl bg-gradient-to-br from-card to-primary/5 border-primary/10">
           <CardHeader>
-            <div className="flex items-center justify-center mb-6">
+            <div className="flex flex-col items-center justify-center mb-6 gap-3">
               <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
                 <Avatar className="h-36 w-36 ring-4 ring-primary/10 transition-all hover:ring-primary/30">
                   <AvatarImage src={avatarUrl} alt={fullName || 'Profile'} />
-                  <AvatarFallback className="text-4xl bg-gradient-to-br from-primary to-accent text-white">
-                    {fullName ? fullName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                  <AvatarFallback className="bg-muted flex items-center justify-center">
+                    {getGenderIcon()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
@@ -233,6 +282,21 @@ const Profile = () => {
                   </div>
                 )}
               </div>
+              {avatarUrl && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemovePhoto();
+                  }}
+                  disabled={uploading}
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Remove Photo
+                </Button>
+              )}
               <input
                 ref={fileInputRef}
                 type="file"
