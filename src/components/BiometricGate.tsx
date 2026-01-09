@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { Button } from '@/components/ui/button';
 import { Fingerprint, Shield } from 'lucide-react';
@@ -19,8 +20,8 @@ const BiometricGate = ({ children }: BiometricGateProps) => {
   }, [isLoading, isEnabled]);
 
   const checkAndAuthenticate = async () => {
-    // Skip biometric check - not available on web
-    if (!isEnabled) {
+    // Skip biometric check if not on native platform or not enabled
+    if (!Capacitor.isNativePlatform() || !isEnabled) {
       setIsUnlocked(true);
       setIsChecking(false);
       return;
