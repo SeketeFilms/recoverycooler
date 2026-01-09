@@ -23,6 +23,7 @@ import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { useNativePushNotifications } from '@/hooks/useNativePushNotifications';
 import { toast } from '@/hooks/use-toast';
 import { Capacitor } from '@capacitor/core';
+import { UpdateChecker } from '@/components/AppUpdateBanner';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -286,6 +287,11 @@ const Settings = () => {
             </Button>
           </Card>
         </div>
+
+        {/* App Updates Section */}
+        <Card className="p-4 mt-6">
+          <UpdateChecker />
+        </Card>
 
         {/* App Attribution */}
         <div className="mt-8 text-center">
