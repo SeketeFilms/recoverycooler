@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Star, MessageSquare, Send, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -36,6 +37,7 @@ const AppReviews = () => {
   const [showForm, setShowForm] = useState(false);
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [userReview, setUserReview] = useState<Review | null>(null);
 
@@ -126,7 +128,7 @@ const AppReviews = () => {
         .update({
           rating,
           review_text: reviewText || null,
-          is_anonymous: false
+          is_anonymous: isAnonymous
         })
         .eq('id', userReview.id);
 
@@ -143,7 +145,7 @@ const AppReviews = () => {
           user_id: user.id,
           rating,
           review_text: reviewText || null,
-          is_anonymous: false
+          is_anonymous: isAnonymous
         });
 
       if (error) {
@@ -153,6 +155,7 @@ const AppReviews = () => {
         setShowForm(false);
         setReviewText('');
         setRating(0);
+        setIsAnonymous(false);
       }
     }
     
@@ -175,6 +178,7 @@ const AppReviews = () => {
       setShowForm(false);
       setRating(0);
       setReviewText('');
+      setIsAnonymous(false);
     }
   };
 
@@ -182,9 +186,11 @@ const AppReviews = () => {
     if (userReview) {
       setRating(userReview.rating);
       setReviewText(userReview.review_text || '');
+      setIsAnonymous(userReview.is_anonymous || false);
     } else {
       setRating(0);
       setReviewText('');
+      setIsAnonymous(false);
     }
     setShowForm(true);
   };
@@ -256,6 +262,17 @@ const AppReviews = () => {
                 onChange={(e) => setReviewText(e.target.value)}
                 rows={3}
               />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="anonymous"
+                checked={isAnonymous}
+                onCheckedChange={(checked) => setIsAnonymous(checked === true)}
+              />
+              <Label htmlFor="anonymous" className="text-sm cursor-pointer">
+                Post anonymously
+              </Label>
             </div>
 
             <div className="flex gap-2">
@@ -336,7 +353,7 @@ const AppReviews = () => {
                   <p className="text-sm">{review.review_text}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  {review.profile_name || `User ${review.user_id.slice(0, 8)}`}
+                  {review.is_anonymous ? 'Anonymous' : (review.profile_name || `User ${review.user_id.slice(0, 8)}`)}
                 </p>
               </div>
             ))}
