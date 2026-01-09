@@ -19,7 +19,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { User, LogOut, Save, Moon, Sun, Edit, Camera, Trash2, Shield, UserCircle, X } from 'lucide-react';
+import { User, LogOut, Save, Moon, Sun, Edit, Camera, Trash2, Shield, UserCircle, X, CheckCircle2 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
@@ -171,6 +172,25 @@ const Profile = () => {
     return <UserCircle className="w-16 h-16 text-muted-foreground" />;
   };
 
+  // Calculate profile completion percentage
+  const calculateProfileCompletion = () => {
+    const fields = [
+      { name: 'Full Name', filled: !!fullName.trim() },
+      { name: 'Username', filled: !!username.trim() },
+      { name: 'Gender', filled: !!gender.trim() },
+      { name: 'Country', filled: !!country && country !== 'US' }, // Count as filled if changed from default
+      { name: 'Profile Photo', filled: !!avatarUrl },
+    ];
+    
+    const filledCount = fields.filter(f => f.filled).length;
+    const percentage = Math.round((filledCount / fields.length) * 100);
+    const missingFields = fields.filter(f => !f.filled).map(f => f.name);
+    
+    return { percentage, filledCount, total: fields.length, missingFields };
+  };
+
+  const profileCompletion = calculateProfileCompletion();
+
   const handleSaveProfile = async () => {
     if (!user) return;
     setLoading(true);
@@ -262,6 +282,39 @@ const Profile = () => {
           </h1>
           <p className="text-base text-muted-foreground mt-2">Manage your account information</p>
         </div>
+
+        {/* Profile Completion Indicator */}
+        <Card className={`gentle-fade-in ${profileCompletion.percentage === 100 ? 'border-green-500/50 bg-green-500/5' : 'border-amber-500/50 bg-amber-500/5'}`}>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className={`p-3 rounded-full ${profileCompletion.percentage === 100 ? 'bg-green-500/20' : 'bg-amber-500/20'}`}>
+                <CheckCircle2 className={`w-6 h-6 ${profileCompletion.percentage === 100 ? 'text-green-500' : 'text-amber-500'}`} />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold">Profile Completion</h3>
+                  <span className={`text-lg font-bold ${profileCompletion.percentage === 100 ? 'text-green-500' : 'text-amber-500'}`}>
+                    {profileCompletion.percentage}%
+                  </span>
+                </div>
+                <Progress 
+                  value={profileCompletion.percentage} 
+                  className={`h-2 ${profileCompletion.percentage === 100 ? '[&>div]:bg-green-500' : '[&>div]:bg-amber-500'}`}
+                />
+                {profileCompletion.percentage < 100 && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Missing: {profileCompletion.missingFields.join(', ')}
+                  </p>
+                )}
+                {profileCompletion.percentage === 100 && (
+                  <p className="text-sm text-green-600 dark:text-green-400 mt-2">
+                    🎉 Your profile is complete!
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="gentle-fade-in shadow-xl bg-gradient-to-br from-card to-primary/5 border-primary/10">
           <CardHeader>
