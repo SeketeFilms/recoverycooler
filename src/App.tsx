@@ -11,6 +11,7 @@ import SwipeableLayout from "./components/SwipeableLayout";
 import OfflineIndicator from "./components/OfflineIndicator";
 import OfflineAssistance from "./components/OfflineAssistance";
 import BiometricGate from "./components/BiometricGate";
+import { AppUpdateBanner } from "./components/AppUpdateBanner";
 import { useOnlineStatus } from "./hooks/useOnlineStatus";
 import { useOfflineCache } from "./hooks/useOfflineCache";
 import Index from "./pages/Index";
@@ -77,6 +78,7 @@ const AppContent = () => {
 
   return (
     <>
+      <AppUpdateBanner />
       <OfflineIndicator />
       <Routes>
         <Route path="/" element={<Index />} />
