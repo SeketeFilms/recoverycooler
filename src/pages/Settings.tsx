@@ -24,6 +24,7 @@ import { useNativePushNotifications } from '@/hooks/useNativePushNotifications';
 import { toast } from '@/hooks/use-toast';
 import { Capacitor } from '@capacitor/core';
 import { UpdateChecker } from '@/components/AppUpdateBanner';
+import ChangelogHistory from '@/components/ChangelogHistory';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -292,6 +293,11 @@ const Settings = () => {
         <Card className="p-4 mt-6">
           <UpdateChecker />
         </Card>
+
+        {/* Changelog History Section */}
+        <div className="mt-6">
+          <ChangelogHistory />
+        </div>
 
         {/* App Attribution */}
         <div className="mt-8 text-center">
