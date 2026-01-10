@@ -26,3 +26,9 @@ verify_jwt = true
 
 [functions.send-streak-notification]
 verify_jwt = true
+
+[functions.check-app-version]
+verify_jwt = false
+
+[functions.send-update-notification]
+verify_jwt = false
