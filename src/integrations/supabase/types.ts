@@ -101,6 +101,42 @@ export type Database = {
         }
         Relationships: []
       }
+      app_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_current: boolean
+          is_required: boolean
+          minimum_supported_version: string | null
+          release_date: string
+          release_notes: string
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_current?: boolean
+          is_required?: boolean
+          minimum_supported_version?: string | null
+          release_date?: string
+          release_notes: string
+          version: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_current?: boolean
+          is_required?: boolean
+          minimum_supported_version?: string | null
+          release_date?: string
+          release_notes?: string
+          version?: string
+        }
+        Relationships: []
+      }
       chat_conversations: {
         Row: {
           addiction_type: string
