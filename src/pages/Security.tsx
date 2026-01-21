@@ -14,7 +14,8 @@ import {
   Clock, 
   Smartphone,
   AlertTriangle,
-  Lock
+  Lock,
+  ArrowLeft
 } from 'lucide-react';
 import { format } from 'date-fns';
 import {
@@ -103,6 +104,14 @@ export default function Security() {
       <div className="container max-w-4xl mx-auto p-4 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3 pt-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate(-1)}
+            className="rounded-full"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
           <Shield className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-3xl font-bold">Security Settings</h1>
