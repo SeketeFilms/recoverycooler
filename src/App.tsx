@@ -44,6 +44,7 @@ import AccountabilityPartners from "./pages/AccountabilityPartners";
 import DataExport from "./pages/DataExport";
 import Reports from "./pages/Reports";
 import LocationAlerts from "./pages/LocationAlerts";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 // Wrapper for swipeable main routes
 const SwipeableRoute = ({ children }: { children: React.ReactNode }) => (
@@ -292,6 +293,7 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <MainRouteBottomNav />
