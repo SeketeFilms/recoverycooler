@@ -141,7 +141,7 @@ const PrivacyPolicy = () => {
                 If you have questions about this Privacy Policy or your data, please contact us at:
               </p>
               <p className="text-muted-foreground mt-2">
-                <strong>Email:</strong> support@recoverycooler.com<br />
+                <strong>Email:</strong> info@semogrouptech.com<br />
                 <strong>Developer:</strong> Sekete Films Production/Se-Mo Group
               </p>
             </section>
