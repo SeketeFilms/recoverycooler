@@ -45,6 +45,7 @@ import DataExport from "./pages/DataExport";
 import Reports from "./pages/Reports";
 import LocationAlerts from "./pages/LocationAlerts";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import DataDeletionRequest from "./pages/DataDeletionRequest";
 
 // Wrapper for swipeable main routes
@@ -295,6 +296,7 @@ const AppContent = () => {
           }
         />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/data-deletion" element={<DataDeletionRequest />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
