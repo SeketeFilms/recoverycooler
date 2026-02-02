@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Loader2, ShieldAlert, ShieldCheck, Shield } from 'lucide-react';
 import { z } from 'zod';
@@ -128,6 +129,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [gender, setGender] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
@@ -438,13 +440,35 @@ const Auth = () => {
                   </div>
                 )}
               </div>
+              {isSignUp && (
+                <div className="flex items-start space-x-3 pt-2">
+                  <Checkbox
+                    id="terms"
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
+                  >
+                    I agree to the{' '}
+                    <Link to="/terms-of-service" className="text-primary hover:underline" target="_blank">
+                      Terms of Service
+                    </Link>
+                    {' '}and{' '}
+                    <Link to="/privacy-policy" className="text-primary hover:underline" target="_blank">
+                      Privacy Policy
+                    </Link>
+                  </label>
+                </div>
+              )}
               {!isSignUp && rateLimitData.lockedUntil && Date.now() < rateLimitData.lockedUntil && (
                 <div className="flex items-center gap-2 p-3 rounded-md bg-destructive/10 text-destructive text-sm">
                   <ShieldAlert className="h-4 w-4" />
                   <span>Account locked. Try again in {Math.ceil((rateLimitData.lockedUntil - Date.now()) / 1000 / 60)} minutes.</span>
                 </div>
               )}
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" disabled={loading || (isSignUp && !acceptedTerms)}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isSignUp ? 'Create Account' : 'Sign In'}
               </Button>
