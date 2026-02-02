@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { CountrySelector } from '@/components/CountrySelector';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { ChevronRight } from 'lucide-react';
 import { z } from 'zod';
@@ -28,6 +29,7 @@ const Onboarding = () => {
   const [fullName, setFullName] = useState('');
   const [country, setCountry] = useState('US');
   const [addictionType, setAddictionType] = useState<'gambling' | 'alcohol' | 'pornography'>('gambling');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -129,7 +131,28 @@ const Onboarding = () => {
               </RadioGroup>
             </div>
 
-            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+            <div className="flex items-start space-x-3 pt-2">
+              <Checkbox
+                id="onboarding-terms"
+                checked={acceptedTerms}
+                onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+              />
+              <label
+                htmlFor="onboarding-terms"
+                className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
+              >
+                I agree to the{' '}
+                <Link to="/terms-of-service" className="text-primary hover:underline" target="_blank">
+                  Terms of Service
+                </Link>
+                {' '}and{' '}
+                <Link to="/privacy-policy" className="text-primary hover:underline" target="_blank">
+                  Privacy Policy
+                </Link>
+              </label>
+            </div>
+
+            <Button type="submit" size="lg" className="w-full" disabled={isLoading || !acceptedTerms}>
               {isLoading ? 'Saving...' : 'Complete Setup'}
               <ChevronRight className="ml-2 h-5 w-5" />
             </Button>

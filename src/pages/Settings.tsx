@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,7 +17,10 @@ import {
   Fingerprint,
   Bell,
   Coffee,
-  Heart
+  Heart,
+  FileText,
+  ShieldCheck,
+  Trash2
 } from 'lucide-react';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { useNativePushNotifications } from '@/hooks/useNativePushNotifications';
@@ -297,6 +300,34 @@ const Settings = () => {
         {/* Changelog History Section */}
         <div className="mt-6">
           <ChangelogHistory />
+        </div>
+
+        {/* Legal & Compliance Section */}
+        <div className="mt-8 pt-6 border-t border-border">
+          <h2 className="text-sm font-medium text-muted-foreground mb-4">Legal & Compliance</h2>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link 
+              to="/terms-of-service" 
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <FileText className="h-4 w-4" />
+              Terms of Service
+            </Link>
+            <Link 
+              to="/privacy-policy" 
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Privacy Policy
+            </Link>
+            <Link 
+              to="/data-deletion" 
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Trash2 className="h-4 w-4" />
+              Data Deletion
+            </Link>
+          </div>
         </div>
 
         {/* App Attribution */}
