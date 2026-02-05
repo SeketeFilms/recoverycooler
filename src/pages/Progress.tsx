@@ -4,12 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress as ProgressBar } from '@/components/ui/progress';
-import { ArrowLeft, Trophy, Calendar, Flame, TrendingUp, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Trophy, Calendar, Flame, TrendingUp, CheckCircle, RotateCcw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { differenceInDays } from 'date-fns';
 import BottomNav from '@/components/BottomNav';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface ProgressData {
   clean_since: string;
@@ -188,6 +199,38 @@ const Progress = () => {
     }
   };
 
+  const handleResetProgress = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      const { error } = await supabase
+        .from('progress_tracking')
+        .update({
+          clean_since: today,
+          current_streak: 1,
+          longest_streak: 1,
+          total_check_ins: 1,
+          last_check_in: new Date().toISOString()
+        })
+        .eq('user_id', user!.id);
+
+      if (error) throw error;
+
+      // Delete user achievements to start fresh
+      await supabase
+        .from('user_achievements')
+        .delete()
+        .eq('user_id', user!.id);
+
+      toast.success('Progress reset! Your fresh journey begins today 🌟');
+      loadProgressData();
+      loadAchievements();
+    } catch (error) {
+      console.error('Error resetting progress:', error);
+      toast.error('Failed to reset progress');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center">
@@ -203,11 +246,43 @@ const Progress = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 pb-28">
       <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <div className="flex items-center gap-4 gentle-fade-in">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/home')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-2xl font-bold">Your Progress</h1>
+        <div className="flex items-center justify-between gentle-fade-in">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/home')}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-2xl font-bold">Your Progress</h1>
+          </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm" className="text-destructive border-destructive/50 hover:bg-destructive/10">
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Reset
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset Your Progress?</AlertDialogTitle>
+                <AlertDialogDescription className="space-y-2">
+                  <p>This will reset all your recovery progress including:</p>
+                  <ul className="list-disc list-inside text-sm space-y-1 mt-2">
+                    <li>Your clean days count</li>
+                    <li>Current and longest streak</li>
+                    <li>All unlocked achievements</li>
+                    <li>Total check-ins count</li>
+                  </ul>
+                  <p className="mt-4 font-medium">Your journal entries and other data will be kept.</p>
+                  <p className="text-primary mt-2">A fresh start is a brave step forward! 💪</p>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleResetProgress} className="bg-destructive hover:bg-destructive/90">
+                  Yes, Start Fresh
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         {/* Stats Cards */}
