@@ -618,6 +618,45 @@ export type Database = {
         }
         Relationships: []
       }
+      relapse_logs: {
+        Row: {
+          created_at: string
+          id: string
+          lessons_learned: string | null
+          mood_after: number | null
+          mood_before: number | null
+          notes: string | null
+          relapse_date: string
+          severity: number
+          triggers: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lessons_learned?: string | null
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          relapse_date?: string
+          severity?: number
+          triggers?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lessons_learned?: string | null
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          relapse_date?: string
+          severity?: number
+          triggers?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       risky_locations: {
         Row: {
           created_at: string
