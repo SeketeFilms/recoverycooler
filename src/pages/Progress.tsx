@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress as ProgressBar } from '@/components/ui/progress';
-import { ArrowLeft, Trophy, Calendar, Flame, TrendingUp, CheckCircle, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Trophy, Calendar, Flame, TrendingUp, CheckCircle, RotateCcw, AlertTriangle, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -21,6 +21,29 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+interface RelapseLog {
+  id: string;
+  relapse_date: string;
+  severity: number;
+  triggers: string[] | null;
+  notes: string | null;
+  lessons_learned: string | null;
+  mood_before: number | null;
+  mood_after: number | null;
+  created_at: string;
+}
 
 interface ProgressData {
   clean_since: string;
@@ -46,12 +69,23 @@ const Progress = () => {
   const { user } = useAuth();
   const [progress, setProgress] = useState<ProgressData | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [relapseLogs, setRelapseLogs] = useState<RelapseLog[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Relapse log form state
+  const [showRelapseDialog, setShowRelapseDialog] = useState(false);
+  const [relapseSeverity, setRelapseSeverity] = useState([5]);
+  const [relapseNotes, setRelapseNotes] = useState('');
+  const [relapseLessons, setRelapseLessons] = useState('');
+  const [relapseTriggers, setRelapseTriggers] = useState('');
+  const [relapseMoodBefore, setRelapseMoodBefore] = useState([5]);
+  const [relapseMoodAfter, setRelapseMoodAfter] = useState([3]);
 
   useEffect(() => {
     if (user) {
       loadProgressData();
       loadAchievements();
+      loadRelapseLogs();
     }
   }, [user]);
 
@@ -216,7 +250,6 @@ const Progress = () => {
 
       if (error) throw error;
 
-      // Delete user achievements to start fresh
       await supabase
         .from('user_achievements')
         .delete()
@@ -228,6 +261,89 @@ const Progress = () => {
     } catch (error) {
       console.error('Error resetting progress:', error);
       toast.error('Failed to reset progress');
+    }
+  };
+
+  const handleResetStreakOnly = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      const { error } = await supabase
+        .from('progress_tracking')
+        .update({
+          clean_since: today,
+          current_streak: 1,
+          last_check_in: new Date().toISOString()
+        })
+        .eq('user_id', user!.id);
+
+      if (error) throw error;
+
+      toast.success('Streak reset! Your achievements are safe 🛡️');
+      loadProgressData();
+    } catch (error) {
+      console.error('Error resetting streak:', error);
+      toast.error('Failed to reset streak');
+    }
+  };
+
+  const loadRelapseLogs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('relapse_logs')
+        .select('*')
+        .eq('user_id', user!.id)
+        .order('relapse_date', { ascending: false });
+
+      if (error) throw error;
+      setRelapseLogs(data || []);
+    } catch (error) {
+      console.error('Error loading relapse logs:', error);
+    }
+  };
+
+  const handleLogRelapse = async () => {
+    try {
+      const triggersArray = relapseTriggers.trim() 
+        ? relapseTriggers.split(',').map(t => t.trim()).filter(Boolean)
+        : null;
+
+      const { error } = await supabase
+        .from('relapse_logs')
+        .insert({
+          user_id: user!.id,
+          severity: relapseSeverity[0],
+          notes: relapseNotes || null,
+          lessons_learned: relapseLessons || null,
+          triggers: triggersArray,
+          mood_before: relapseMoodBefore[0],
+          mood_after: relapseMoodAfter[0],
+        });
+
+      if (error) throw error;
+
+      toast.success('Setback logged. Every step teaches something valuable 💙');
+      setShowRelapseDialog(false);
+      setRelapseNotes('');
+      setRelapseLessons('');
+      setRelapseTriggers('');
+      setRelapseSeverity([5]);
+      setRelapseMoodBefore([5]);
+      setRelapseMoodAfter([3]);
+      loadRelapseLogs();
+    } catch (error) {
+      console.error('Error logging relapse:', error);
+      toast.error('Failed to log setback');
+    }
+  };
+
+  const handleDeleteRelapseLog = async (id: string) => {
+    const { error } = await supabase.from('relapse_logs').delete().eq('id', id);
+    if (error) {
+      toast.error('Failed to delete log');
+    } else {
+      toast.success('Log deleted');
+      loadRelapseLogs();
     }
   };
 
@@ -253,36 +369,69 @@ const Progress = () => {
             </Button>
             <h1 className="text-2xl font-bold">Your Progress</h1>
           </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="text-destructive border-destructive/50 hover:bg-destructive/10">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Reset Your Progress?</AlertDialogTitle>
-                <AlertDialogDescription className="space-y-2">
-                  <p>This will reset all your recovery progress including:</p>
-                  <ul className="list-disc list-inside text-sm space-y-1 mt-2">
-                    <li>Your clean days count</li>
-                    <li>Current and longest streak</li>
-                    <li>All unlocked achievements</li>
-                    <li>Total check-ins count</li>
-                  </ul>
-                  <p className="mt-4 font-medium">Your journal entries and other data will be kept.</p>
-                  <p className="text-primary mt-2">A fresh start is a brave step forward! 💪</p>
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleResetProgress} className="bg-destructive hover:bg-destructive/90">
-                  Yes, Start Fresh
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Flame className="h-4 w-4 mr-2" />
+                    Reset Streak Only
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset Streak Only?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <p>This will only reset your streak and clean days count.</p>
+                      <p className="mt-2 font-medium text-primary">Your achievements, check-ins, and all other data will be kept! 🛡️</p>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetStreakOnly} className="bg-destructive hover:bg-destructive/90">
+                      Reset Streak
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Full Reset
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Full Reset?</AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-2">
+                      <p>This will reset ALL recovery progress including:</p>
+                      <ul className="list-disc list-inside text-sm space-y-1 mt-2">
+                        <li>Clean days count</li>
+                        <li>Current and longest streak</li>
+                        <li>All unlocked achievements</li>
+                        <li>Total check-ins count</li>
+                      </ul>
+                      <p className="mt-4 font-medium">Journal entries and other data will be kept.</p>
+                      <p className="text-primary mt-2">A fresh start is a brave step forward! 💪</p>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetProgress} className="bg-destructive hover:bg-destructive/90">
+                      Yes, Start Fresh
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Stats Cards */}
@@ -388,6 +537,102 @@ const Progress = () => {
                 </Card>
               ))}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Relapse Tracking Section */}
+        <Card className="gentle-fade-in">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  Setback Tracker
+                </CardTitle>
+                <CardDescription>
+                  Log setbacks to learn and grow stronger
+                </CardDescription>
+              </div>
+              <Dialog open={showRelapseDialog} onOpenChange={setShowRelapseDialog}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Log Setback
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Log a Setback</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                    <div>
+                      <Label>Severity (1-10): {relapseSeverity[0]}</Label>
+                      <Slider value={relapseSeverity} onValueChange={setRelapseSeverity} min={1} max={10} step={1} className="mt-2" />
+                    </div>
+                    <div>
+                      <Label>Mood Before (1-10): {relapseMoodBefore[0]}</Label>
+                      <Slider value={relapseMoodBefore} onValueChange={setRelapseMoodBefore} min={1} max={10} step={1} className="mt-2" />
+                    </div>
+                    <div>
+                      <Label>Mood After (1-10): {relapseMoodAfter[0]}</Label>
+                      <Slider value={relapseMoodAfter} onValueChange={setRelapseMoodAfter} min={1} max={10} step={1} className="mt-2" />
+                    </div>
+                    <div>
+                      <Label>Triggers (comma-separated)</Label>
+                      <Input placeholder="e.g., Stress, Boredom, Social pressure" value={relapseTriggers} onChange={(e) => setRelapseTriggers(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>What happened?</Label>
+                      <Textarea placeholder="Describe the situation..." value={relapseNotes} onChange={(e) => setRelapseNotes(e.target.value)} rows={3} />
+                    </div>
+                    <div>
+                      <Label>What did you learn?</Label>
+                      <Textarea placeholder="Insights for next time..." value={relapseLessons} onChange={(e) => setRelapseLessons(e.target.value)} rows={3} />
+                    </div>
+                    <Button onClick={handleLogRelapse} className="w-full">Save Setback Log</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {relapseLogs.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">No setbacks logged — keep going strong! 💪</p>
+            ) : (
+              <div className="space-y-3">
+                {relapseLogs.map((log) => (
+                  <Card key={log.id} className="p-4 border-destructive/20">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{new Date(log.relapse_date).toLocaleDateString()}</span>
+                          <Badge variant="outline" className="text-xs">Severity: {log.severity}/10</Badge>
+                        </div>
+                        {log.triggers && log.triggers.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {log.triggers.map((t, i) => (
+                              <Badge key={i} variant="secondary" className="text-xs">{t}</Badge>
+                            ))}
+                          </div>
+                        )}
+                        {log.notes && <p className="text-sm text-muted-foreground">{log.notes}</p>}
+                        {log.lessons_learned && (
+                          <p className="text-sm text-primary italic">💡 {log.lessons_learned}</p>
+                        )}
+                        {(log.mood_before || log.mood_after) && (
+                          <p className="text-xs text-muted-foreground">
+                            Mood: {log.mood_before}/10 → {log.mood_after}/10
+                          </p>
+                        )}
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRelapseLog(log.id)}>
+                        <AlertTriangle className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

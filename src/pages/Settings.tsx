@@ -313,13 +313,15 @@ const Settings = () => {
               <FileText className="h-4 w-4" />
               Terms of Service
             </Link>
-            <Link 
-              to="/privacy-policy" 
+            <a 
+              href="https://sites.google.com/view/recoverycooler?usp=sharing" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               <ShieldCheck className="h-4 w-4" />
               Privacy Policy
-            </Link>
+            </a>
             <Link 
               to="/data-deletion" 
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
