@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.send-update-notification]
 verify_jwt = false
+
+[functions.analyze-relapse-patterns]
+verify_jwt = true

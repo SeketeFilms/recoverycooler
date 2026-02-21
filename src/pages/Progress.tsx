@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { differenceInDays } from 'date-fns';
 import BottomNav from '@/components/BottomNav';
+import RelapseInsights from '@/components/RelapseInsights';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -635,6 +636,9 @@ const Progress = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* AI Insights Section */}
+        <RelapseInsights hasLogs={relapseLogs.length > 0} />
       </div>
       <BottomNav />
     </div>
