@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { differenceInDays } from 'date-fns';
 import BottomNav from '@/components/BottomNav';
 import RelapseInsights from '@/components/RelapseInsights';
+import RelapseTrendCharts from '@/components/RelapseTrendCharts';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -636,6 +637,9 @@ const Progress = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Trend Charts */}
+        <RelapseTrendCharts logs={relapseLogs} />
 
         {/* AI Insights Section */}
         <RelapseInsights hasLogs={relapseLogs.length > 0} />

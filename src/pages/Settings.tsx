@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { useNativePushNotifications } from '@/hooks/useNativePushNotifications';
+import { useWebPushNotifications } from '@/hooks/useWebPushNotifications';
 import { toast } from '@/hooks/use-toast';
 import { Capacitor } from '@capacitor/core';
 import { UpdateChecker } from '@/components/AppUpdateBanner';
@@ -45,6 +46,11 @@ const Settings = () => {
     permissionStatus,
     requestPermission: requestPushPermission 
   } = useNativePushNotifications();
+  const {
+    isSupported: webPushSupported,
+    isGranted: webPushGranted,
+    requestPermission: requestWebPushPermission,
+  } = useWebPushNotifications();
 
   const menuItems = [
     {
@@ -166,6 +172,24 @@ const Settings = () => {
     }
   };
 
+  const handleWebPushToggle = async () => {
+    if (!webPushGranted) {
+      const success = await requestWebPushPermission();
+      if (success) {
+        toast({
+          title: 'Notifications Enabled',
+          description: 'You will now receive browser notifications',
+        });
+      } else {
+        toast({
+          title: 'Permission Denied',
+          description: 'Please enable notifications in your browser settings',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
   const handleBuyMeCoffee = () => {
     window.open('https://www.paypal.com/ncp/payment/PW92XP4Y58LJN', '_blank');
   };
@@ -230,6 +254,32 @@ const Settings = () => {
                 </div>
               </Card>
             )}
+          </div>
+        )}
+
+        {/* Web Push for non-native */}
+        {!isNative && webPushSupported && (
+          <div className="mb-6 space-y-3">
+            <h2 className="text-lg font-semibold text-muted-foreground mb-3">Notifications</h2>
+            <Card className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-muted">
+                    <Bell className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Browser Notifications</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {webPushGranted ? 'Notifications enabled' : 'Enable recovery reminders'}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={webPushGranted}
+                  onCheckedChange={handleWebPushToggle}
+                />
+              </div>
+            </Card>
           </div>
         )}
 

@@ -75,8 +75,8 @@ const Meditation = () => {
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'holdAfterExhale'>('inhale');
   const [phaseTime, setPhaseTime] = useState(0);
   const [cycleCount, setCycleCount] = useState(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const phaseIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const phaseIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     return () => {
