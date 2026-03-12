@@ -44,7 +44,7 @@ const Cooldown = () => {
 
   // Breathing exercise timer
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isPlaying && selectedMode === 'breathing' && currentStep < breathingSteps.length - 1) {
       interval = setInterval(() => {
         setCurrentStep((prev) => Math.min(prev + 1, breathingSteps.length - 1));

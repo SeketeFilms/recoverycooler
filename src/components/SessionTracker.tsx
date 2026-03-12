@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const SessionTracker = () => {
   const { user } = useAuth();
   const lastActivityRef = useRef<number>(Date.now());
-  const activityTimerRef = useRef<NodeJS.Timeout>();
+  const activityTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const reportActivity = async (activity: 'active' | 'inactive') => {
     if (!user) return;
