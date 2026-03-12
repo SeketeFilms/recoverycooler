@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { useNativePushNotifications } from '@/hooks/useNativePushNotifications';
-import { toast } from '@/hooks/use-toast';
+import { useWebPushNotifications } from '@/hooks/useWebPushNotifications';
 import { Capacitor } from '@capacitor/core';
 import { UpdateChecker } from '@/components/AppUpdateBanner';
 import ChangelogHistory from '@/components/ChangelogHistory';
