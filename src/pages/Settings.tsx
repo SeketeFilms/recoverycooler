@@ -257,6 +257,32 @@ const Settings = () => {
           </div>
         )}
 
+        {/* Web Push for non-native */}
+        {!isNative && webPushSupported && (
+          <div className="mb-6 space-y-3">
+            <h2 className="text-lg font-semibold text-muted-foreground mb-3">Notifications</h2>
+            <Card className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-muted">
+                    <Bell className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Browser Notifications</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {webPushGranted ? 'Notifications enabled' : 'Enable recovery reminders'}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={webPushGranted}
+                  onCheckedChange={handleWebPushToggle}
+                />
+              </div>
+            </Card>
+          </div>
+        )}
+
         <div className="space-y-3">
           {menuItems.map((item) => {
             const Icon = item.icon;
