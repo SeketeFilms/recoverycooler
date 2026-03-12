@@ -25,6 +25,7 @@ import {
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { useNativePushNotifications } from '@/hooks/useNativePushNotifications';
 import { useWebPushNotifications } from '@/hooks/useWebPushNotifications';
+import { toast } from '@/hooks/use-toast';
 import { Capacitor } from '@capacitor/core';
 import { UpdateChecker } from '@/components/AppUpdateBanner';
 import ChangelogHistory from '@/components/ChangelogHistory';
@@ -45,6 +46,11 @@ const Settings = () => {
     permissionStatus,
     requestPermission: requestPushPermission 
   } = useNativePushNotifications();
+  const {
+    isSupported: webPushSupported,
+    isGranted: webPushGranted,
+    requestPermission: requestWebPushPermission,
+  } = useWebPushNotifications();
 
   const menuItems = [
     {
