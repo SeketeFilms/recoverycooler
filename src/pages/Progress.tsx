@@ -638,6 +638,9 @@ const Progress = () => {
           </CardContent>
         </Card>
 
+        {/* Trend Charts */}
+        <RelapseTrendCharts logs={relapseLogs} />
+
         {/* AI Insights Section */}
         <RelapseInsights hasLogs={relapseLogs.length > 0} />
       </div>
