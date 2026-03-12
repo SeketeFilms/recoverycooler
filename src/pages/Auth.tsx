@@ -13,8 +13,6 @@ import { toast } from 'sonner';
 import { Loader2, ShieldAlert, ShieldCheck, Shield } from 'lucide-react';
 import { z } from 'zod';
 import { Progress } from '@/components/ui/progress';
-import { z } from 'zod';
-import { Progress } from '@/components/ui/progress';
 
 // HTML entity encoding to prevent XSS in emails
 function escapeHtml(unsafe: string): string {

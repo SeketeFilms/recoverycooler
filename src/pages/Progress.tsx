@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { differenceInDays } from 'date-fns';
 import BottomNav from '@/components/BottomNav';
 import RelapseInsights from '@/components/RelapseInsights';
+import RelapseTrendCharts from '@/components/RelapseTrendCharts';
 import {
   AlertDialog,
   AlertDialogAction,
