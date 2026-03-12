@@ -172,6 +172,24 @@ const Settings = () => {
     }
   };
 
+  const handleWebPushToggle = async () => {
+    if (!webPushGranted) {
+      const success = await requestWebPushPermission();
+      if (success) {
+        toast({
+          title: 'Notifications Enabled',
+          description: 'You will now receive browser notifications',
+        });
+      } else {
+        toast({
+          title: 'Permission Denied',
+          description: 'Please enable notifications in your browser settings',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
   const handleBuyMeCoffee = () => {
     window.open('https://www.paypal.com/ncp/payment/PW92XP4Y58LJN', '_blank');
   };
