@@ -117,6 +117,13 @@ const Settings = () => {
       color: 'text-primary',
     },
     {
+      icon: Bell,
+      title: 'Notifications',
+      description: 'Reminders and test push delivery',
+      path: '/settings/notifications',
+      color: 'text-primary',
+    },
+    {
       icon: Lock,
       title: 'Security',
       description: 'Manage your account security',

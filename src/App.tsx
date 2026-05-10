@@ -47,6 +47,7 @@ import LocationAlerts from "./pages/LocationAlerts";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import DataDeletionRequest from "./pages/DataDeletionRequest";
+import NotificationsSettings from "./pages/NotificationsSettings";
 
 // Wrapper for swipeable main routes
 const SwipeableRoute = ({ children }: { children: React.ReactNode }) => (
@@ -252,6 +253,14 @@ const AppContent = () => {
           element={
             <ProtectedRoute>
               <ShortcutsSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationsSettings />
             </ProtectedRoute>
           }
         />
