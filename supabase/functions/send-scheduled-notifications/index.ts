@@ -6,9 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// VAPID keys - In production, these should be environment variables
-const VAPID_PUBLIC_KEY = 'BEL_4GYhqR5K9Z8vN8vQZGhqR5K9Z8vN8vQZGhqR5K9Z8vN8vQZGhqR5K9Z8vN8vQZGhq';
-const VAPID_PRIVATE_KEY = 'your-vapid-private-key';
+// VAPID keys are loaded from environment secrets. Push delivery is skipped
+// if they are not configured.
+const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY') ?? '';
+const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY') ?? '';
 
 async function sendPushNotification(subscription: any, message: string, title: string) {
   try {
