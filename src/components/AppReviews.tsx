@@ -65,46 +65,38 @@ const AppReviews = () => {
   }, [user]);
 
   const loadReviews = async () => {
+    // Public-safe RPC: hides user_id when review is anonymous
     const { data: reviewsData, error: reviewsError } = await supabase
-      .from('app_reviews')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10);
+      .rpc('get_public_app_reviews');
 
     if (reviewsError || !reviewsData) {
       setLoading(false);
       return;
     }
 
-    // Fetch profiles for all reviews to show real names
-    const allUserIds = reviewsData.map(r => r.user_id);
-    let profilesMap: Record<string, string> = {};
-    
-    if (allUserIds.length > 0) {
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('user_id, username, full_name')
-        .in('user_id', allUserIds);
-
-      if (profilesData) {
-        profilesData.forEach((profile) => {
-          const displayName = profile.username || profile.full_name || null;
-          if (displayName) {
-            profilesMap[profile.user_id] = displayName;
-          }
-        });
-      }
-    }
-
-    const reviewsWithNames = reviewsData.map(review => ({
-      ...review,
-      profile_name: profilesMap[review.user_id]
+    const limited = reviewsData.slice(0, 10);
+    const reviewsWithNames: Review[] = limited.map((r: any) => ({
+      id: r.id,
+      user_id: r.user_id,
+      rating: r.rating,
+      review_text: r.review_text,
+      is_anonymous: r.is_anonymous,
+      created_at: r.created_at,
+      profile_name: r.display_name || undefined,
     }));
 
     setReviews(reviewsWithNames);
+
     if (user) {
-      const existing = reviewsWithNames.find(r => r.user_id === user.id);
-      setUserReview(existing || null);
+      // Fetch the current user's own review (including when anonymous) directly
+      const { data: own } = await supabase
+        .from('app_reviews')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      setUserReview(own ? { ...own, profile_name: undefined } : null);
+    } else {
+      setUserReview(null);
     }
     setLoading(false);
   };
