@@ -257,6 +257,14 @@ const AppContent = () => {
           }
         />
         <Route
+          path="/settings/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationsSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/meditation"
           element={
             <ProtectedRoute>
