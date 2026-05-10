@@ -42,10 +42,20 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Internal service-only endpoint: require the service role key
+  const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+  const authHeader = req.headers.get('Authorization') ?? '';
+  if (!SERVICE_ROLE_KEY || authHeader !== `Bearer ${SERVICE_ROLE_KEY}`) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized - internal service only' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      SERVICE_ROLE_KEY
     );
 
     // Get the version to notify about (optional - defaults to latest required version)
