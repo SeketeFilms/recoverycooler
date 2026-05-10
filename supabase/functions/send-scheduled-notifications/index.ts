@@ -6,9 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// VAPID keys - In production, these should be environment variables
-const VAPID_PUBLIC_KEY = 'BEL_4GYhqR5K9Z8vN8vQZGhqR5K9Z8vN8vQZGhqR5K9Z8vN8vQZGhqR5K9Z8vN8vQZGhq';
-const VAPID_PRIVATE_KEY = 'your-vapid-private-key';
+// VAPID keys are loaded from environment secrets. Push delivery is skipped
+// if they are not configured.
+const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY') ?? '';
+const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY') ?? '';
 
 async function sendPushNotification(subscription: any, message: string, title: string) {
   try {
@@ -45,10 +46,20 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Internal cron-only endpoint: require the service role key
+  const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+  const authHeader = req.headers.get('Authorization') ?? '';
+  if (!SERVICE_ROLE_KEY || authHeader !== `Bearer ${SERVICE_ROLE_KEY}`) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized - internal service only' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      SERVICE_ROLE_KEY
     );
 
     // Get current hour in UTC
