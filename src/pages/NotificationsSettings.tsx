@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Bell, BellRing, Clock, Send } from 'lucide-react';
+import { ArrowLeft, Bell, BellRing, Clock, Send, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Prefs {
