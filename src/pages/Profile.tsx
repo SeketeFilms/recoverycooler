@@ -98,8 +98,10 @@ const Profile = () => {
     try {
       // Delete old avatar if exists
       if (avatarUrl) {
-        const oldPath = avatarUrl.split('/').slice(-2).join('/');
-        await supabase.storage.from('avatars').remove([oldPath]);
+        const { extractAvatarPath } = await import('@/lib/avatarUrl');
+        const oldPath = extractAvatarPath(avatarUrl);
+        if (oldPath) await supabase.storage.from('avatars').remove([oldPath]);
+        invalidateAvatarCache(avatarUrl);
       }
 
       // Upload new avatar
@@ -109,20 +111,18 @@ const Profile = () => {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      // Update profile
+      // Store path (bucket is now private — signed URLs resolved on demand)
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
+        .update({ avatar_url: filePath })
         .eq('user_id', user.id);
 
       if (updateError) throw updateError;
 
-      setAvatarUrl(publicUrl);
+      invalidateAvatarCache(filePath);
+      const signed = await getSignedAvatarUrl(filePath);
+      setAvatarUrl(filePath);
+      setDisplayAvatarUrl(signed || '');
       toast.success('Profile picture updated!');
     } catch (error) {
       toast.error('Failed to upload profile picture');
@@ -138,9 +138,9 @@ const Profile = () => {
     setUploading(true);
 
     try {
-      // Delete avatar from storage
-      const oldPath = avatarUrl.split('/').slice(-2).join('/');
-      await supabase.storage.from('avatars').remove([oldPath]);
+      const { extractAvatarPath } = await import('@/lib/avatarUrl');
+      const oldPath = extractAvatarPath(avatarUrl);
+      if (oldPath) await supabase.storage.from('avatars').remove([oldPath]);
 
       // Update profile to remove avatar_url
       const { error: updateError } = await supabase
