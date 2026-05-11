@@ -35,6 +35,7 @@ export default function NotificationsSettings() {
   const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [runningNow, setRunningNow] = useState(false);
 
   useEffect(() => {
     if (!user) return;
