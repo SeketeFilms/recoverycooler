@@ -188,6 +188,19 @@ export default function NotificationsSettings() {
               <Send className="mr-2 h-4 w-4" />
               Send Test Notification
             </Button>
+
+            <Button
+              variant="secondary"
+              onClick={handleRunNow}
+              disabled={runningNow}
+              className="w-full"
+            >
+              <Zap className="mr-2 h-4 w-4" />
+              {runningNow ? 'Running…' : 'Run Daily Check-in Now'}
+            </Button>
+            <p className="text-xs text-muted-foreground -mt-1">
+              Triggers the scheduled check-in immediately so you can verify delivery.
+            </p>
           </CardContent>
         </Card>
 
