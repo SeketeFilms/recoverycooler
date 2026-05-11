@@ -150,7 +150,9 @@ const Profile = () => {
 
       if (updateError) throw updateError;
 
+      invalidateAvatarCache(avatarUrl);
       setAvatarUrl('');
+      setDisplayAvatarUrl('');
       toast.success('Profile picture removed!');
     } catch (error) {
       toast.error('Failed to remove profile picture');
