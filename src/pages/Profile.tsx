@@ -40,6 +40,7 @@ const Profile = () => {
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('US');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [displayAvatarUrl, setDisplayAvatarUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
