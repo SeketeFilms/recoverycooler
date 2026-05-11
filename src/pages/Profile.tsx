@@ -332,7 +332,7 @@ const Profile = () => {
             <div className="flex flex-col items-center justify-center mb-6 gap-3">
               <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
                 <Avatar className="h-36 w-36 ring-4 ring-primary/10 transition-all hover:ring-primary/30">
-                  <AvatarImage src={avatarUrl} alt={fullName || 'Profile'} />
+                  <AvatarImage src={displayAvatarUrl || undefined} alt={fullName || 'Profile'} />
                   <AvatarFallback className="bg-muted flex items-center justify-center">
                     {getGenderIcon()}
                   </AvatarFallback>
