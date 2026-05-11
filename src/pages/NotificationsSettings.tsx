@@ -109,6 +109,34 @@ export default function NotificationsSettings() {
     toast.success('Test notification sent');
   };
 
+  const handleRunNow = async () => {
+    setRunningNow(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('trigger-checkin-now', {
+        body: {},
+      });
+      if (error) throw error;
+
+      const title = data?.title ?? 'Recovery Cooler check-in';
+      const message = data?.message ?? 'Keep going — you are doing great.';
+
+      if (isGranted) {
+        sendLocalNotification(title, { body: message, tag: 'run-now-checkin' });
+      }
+
+      toast.success(
+        data?.deliveredTo > 0
+          ? `Check-in dispatched (${data.deliveredTo} device${data.deliveredTo === 1 ? '' : 's'})`
+          : 'Check-in fired — shown locally (no registered devices yet)'
+      );
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || 'Failed to run check-in');
+    } finally {
+      setRunningNow(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container max-w-2xl mx-auto p-4 space-y-6">
