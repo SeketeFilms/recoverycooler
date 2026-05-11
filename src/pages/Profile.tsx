@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { getSignedAvatarUrl, invalidateAvatarCache } from '@/lib/avatarUrl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,6 +41,7 @@ const Profile = () => {
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('US');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [displayAvatarUrl, setDisplayAvatarUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -69,7 +71,14 @@ const Profile = () => {
       setUsername(data.username || '');
       setGender(data.gender || '');
       setCountry(data.country || 'US');
-      setAvatarUrl(data.avatar_url || '');
+      const stored = data.avatar_url || '';
+      setAvatarUrl(stored);
+      if (stored) {
+        const signed = await getSignedAvatarUrl(stored);
+        setDisplayAvatarUrl(signed || '');
+      } else {
+        setDisplayAvatarUrl('');
+      }
     }
   };
 
@@ -89,8 +98,10 @@ const Profile = () => {
     try {
       // Delete old avatar if exists
       if (avatarUrl) {
-        const oldPath = avatarUrl.split('/').slice(-2).join('/');
-        await supabase.storage.from('avatars').remove([oldPath]);
+        const { extractAvatarPath } = await import('@/lib/avatarUrl');
+        const oldPath = extractAvatarPath(avatarUrl);
+        if (oldPath) await supabase.storage.from('avatars').remove([oldPath]);
+        invalidateAvatarCache(avatarUrl);
       }
 
       // Upload new avatar
@@ -100,20 +111,18 @@ const Profile = () => {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      // Update profile
+      // Store path (bucket is now private — signed URLs resolved on demand)
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
+        .update({ avatar_url: filePath })
         .eq('user_id', user.id);
 
       if (updateError) throw updateError;
 
-      setAvatarUrl(publicUrl);
+      invalidateAvatarCache(filePath);
+      const signed = await getSignedAvatarUrl(filePath);
+      setAvatarUrl(filePath);
+      setDisplayAvatarUrl(signed || '');
       toast.success('Profile picture updated!');
     } catch (error) {
       toast.error('Failed to upload profile picture');
@@ -129,9 +138,9 @@ const Profile = () => {
     setUploading(true);
 
     try {
-      // Delete avatar from storage
-      const oldPath = avatarUrl.split('/').slice(-2).join('/');
-      await supabase.storage.from('avatars').remove([oldPath]);
+      const { extractAvatarPath } = await import('@/lib/avatarUrl');
+      const oldPath = extractAvatarPath(avatarUrl);
+      if (oldPath) await supabase.storage.from('avatars').remove([oldPath]);
 
       // Update profile to remove avatar_url
       const { error: updateError } = await supabase
@@ -141,7 +150,9 @@ const Profile = () => {
 
       if (updateError) throw updateError;
 
+      invalidateAvatarCache(avatarUrl);
       setAvatarUrl('');
+      setDisplayAvatarUrl('');
       toast.success('Profile picture removed!');
     } catch (error) {
       toast.error('Failed to remove profile picture');
@@ -321,7 +332,7 @@ const Profile = () => {
             <div className="flex flex-col items-center justify-center mb-6 gap-3">
               <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
                 <Avatar className="h-36 w-36 ring-4 ring-primary/10 transition-all hover:ring-primary/30">
-                  <AvatarImage src={avatarUrl} alt={fullName || 'Profile'} />
+                  <AvatarImage src={displayAvatarUrl || undefined} alt={fullName || 'Profile'} />
                   <AvatarFallback className="bg-muted flex items-center justify-center">
                     {getGenderIcon()}
                   </AvatarFallback>

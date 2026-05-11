@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Bell, BellRing, Clock, Send } from 'lucide-react';
+import { ArrowLeft, Bell, BellRing, Clock, Send, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Prefs {
@@ -35,6 +35,7 @@ export default function NotificationsSettings() {
   const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [runningNow, setRunningNow] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -108,6 +109,34 @@ export default function NotificationsSettings() {
     toast.success('Test notification sent');
   };
 
+  const handleRunNow = async () => {
+    setRunningNow(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('trigger-checkin-now', {
+        body: {},
+      });
+      if (error) throw error;
+
+      const title = data?.title ?? 'Recovery Cooler check-in';
+      const message = data?.message ?? 'Keep going — you are doing great.';
+
+      if (isGranted) {
+        sendLocalNotification(title, { body: message, tag: 'run-now-checkin' });
+      }
+
+      toast.success(
+        data?.deliveredTo > 0
+          ? `Check-in dispatched (${data.deliveredTo} device${data.deliveredTo === 1 ? '' : 's'})`
+          : 'Check-in fired — shown locally (no registered devices yet)'
+      );
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || 'Failed to run check-in');
+    } finally {
+      setRunningNow(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container max-w-2xl mx-auto p-4 space-y-6">
@@ -159,6 +188,19 @@ export default function NotificationsSettings() {
               <Send className="mr-2 h-4 w-4" />
               Send Test Notification
             </Button>
+
+            <Button
+              variant="secondary"
+              onClick={handleRunNow}
+              disabled={runningNow}
+              className="w-full"
+            >
+              <Zap className="mr-2 h-4 w-4" />
+              {runningNow ? 'Running…' : 'Run Daily Check-in Now'}
+            </Button>
+            <p className="text-xs text-muted-foreground -mt-1">
+              Triggers the scheduled check-in immediately so you can verify delivery.
+            </p>
           </CardContent>
         </Card>
 

@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.analyze-relapse-patterns]
 verify_jwt = true
+
+[functions.trigger-checkin-now]
+verify_jwt = true
