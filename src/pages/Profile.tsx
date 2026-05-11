@@ -69,7 +69,14 @@ const Profile = () => {
       setUsername(data.username || '');
       setGender(data.gender || '');
       setCountry(data.country || 'US');
-      setAvatarUrl(data.avatar_url || '');
+      const stored = data.avatar_url || '';
+      setAvatarUrl(stored);
+      if (stored) {
+        const signed = await getSignedAvatarUrl(stored);
+        setDisplayAvatarUrl(signed || '');
+      } else {
+        setDisplayAvatarUrl('');
+      }
     }
   };
 
