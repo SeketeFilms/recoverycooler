@@ -38,7 +38,7 @@ const OnboardingTutorial = () => {
   const [index, setIndex] = useState(0);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { triggerLight } = useHapticFeedback();
+  const { trigger } = useHapticFeedback();
   const last = index === slides.length - 1;
   const Icon = slides[index].icon;
 
