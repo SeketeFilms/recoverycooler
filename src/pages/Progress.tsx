@@ -438,6 +438,7 @@ const Progress = () => {
               </AlertDialog>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
 
         {/* Stats Cards */}
