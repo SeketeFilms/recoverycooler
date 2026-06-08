@@ -74,7 +74,7 @@ const Onboarding = () => {
     }
 
     toast.success('Welcome! Your profile has been created');
-    navigate('/home');
+    navigate('/onboarding/tutorial');
   };
 
   return (

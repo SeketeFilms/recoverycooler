@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Play, Pause, RotateCcw, Wind, Heart, Brain, Moon } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import { RecoveryCoolerTracks } from '@/components/RecoveryCoolerTracks';
 
 interface Exercise {
   id: string;
@@ -280,6 +281,7 @@ const Meditation = () => {
                 </Card>
               );
             })}
+            <RecoveryCoolerTracks />
           </div>
         ) : (
           <div className="space-y-8">

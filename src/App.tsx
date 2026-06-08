@@ -48,6 +48,12 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import DataDeletionRequest from "./pages/DataDeletionRequest";
 import NotificationsSettings from "./pages/NotificationsSettings";
+import OnboardingTutorial from "./pages/OnboardingTutorial";
+import WeeklyDashboard from "./pages/WeeklyDashboard";
+import ExclusionSetup from "./pages/ExclusionSetup";
+import PublicJourney from "./pages/PublicJourney";
+import ShareSettings from "./pages/ShareSettings";
+import { ExclusionGate } from "./components/ExclusionGate";
 
 // Wrapper for swipeable main routes
 const SwipeableRoute = ({ children }: { children: React.ReactNode }) => (
@@ -87,7 +93,12 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/journey/:slug" element={<PublicJourney />} />
         <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/onboarding/tutorial" element={<ProtectedRoute><OnboardingTutorial /></ProtectedRoute>} />
+        <Route path="/progress/weekly" element={<ProtectedRoute><WeeklyDashboard /></ProtectedRoute>} />
+        <Route path="/exclusion/setup" element={<ProtectedRoute><ExclusionSetup /></ProtectedRoute>} />
+        <Route path="/share-settings" element={<ProtectedRoute><ShareSettings /></ProtectedRoute>} />
         <Route
           path="/home"
           element={
@@ -325,7 +336,9 @@ const App = () => (
         <SessionTracker />
         <BrowserRouter>
           <BiometricGate>
-            <AppContent />
+            <ExclusionGate>
+              <AppContent />
+            </ExclusionGate>
           </BiometricGate>
         </BrowserRouter>
       </TooltipProvider>
