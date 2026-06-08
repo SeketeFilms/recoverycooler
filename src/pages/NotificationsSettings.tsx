@@ -17,6 +17,9 @@ interface Prefs {
   recovery_checkins: boolean;
   meditation_time: string;
   checkin_time: string;
+  spending_alerts: boolean;
+  time_reminder_enabled: boolean;
+  time_reminder_at: string;
 }
 
 const DEFAULTS: Prefs = {
@@ -24,6 +27,9 @@ const DEFAULTS: Prefs = {
   recovery_checkins: true,
   meditation_time: '09:00',
   checkin_time: '20:00',
+  spending_alerts: true,
+  time_reminder_enabled: false,
+  time_reminder_at: '18:00',
 };
 
 export default function NotificationsSettings() {
@@ -51,6 +57,9 @@ export default function NotificationsSettings() {
           recovery_checkins: data.recovery_checkins ?? true,
           meditation_time: (data.meditation_time ?? '09:00:00').slice(0, 5),
           checkin_time: (data.checkin_time ?? '20:00:00').slice(0, 5),
+          spending_alerts: (data as any).spending_alerts ?? true,
+          time_reminder_enabled: (data as any).time_reminder_enabled ?? false,
+          time_reminder_at: ((data as any).time_reminder_at ?? '18:00:00').slice(0, 5),
         });
       }
       setLoading(false);
@@ -67,7 +76,10 @@ export default function NotificationsSettings() {
         recovery_checkins: next.recovery_checkins,
         meditation_time: `${next.meditation_time}:00`,
         checkin_time: `${next.checkin_time}:00`,
-      },
+        spending_alerts: next.spending_alerts,
+        time_reminder_enabled: next.time_reminder_enabled,
+        time_reminder_at: `${next.time_reminder_at}:00`,
+      } as any,
       { onConflict: 'user_id' }
     );
     setSaving(false);
@@ -263,6 +275,56 @@ export default function NotificationsSettings() {
                   type="time"
                   value={prefs.checkin_time}
                   onChange={(e) => update('checkin_time', e.target.value)}
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Alerts &amp; Custom Reminders
+            </CardTitle>
+            <CardDescription>
+              Get pinged about spending limits and at a custom time of day.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="font-medium">Spending limit alerts</Label>
+                <p className="text-xs text-muted-foreground">Warn me when I cross my daily limit</p>
+              </div>
+              <Switch
+                checked={prefs.spending_alerts}
+                disabled={loading || saving}
+                onCheckedChange={(v) => update('spending_alerts', v)}
+              />
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="font-medium">Custom time reminder</Label>
+                <p className="text-xs text-muted-foreground">A daily nudge at the time you choose</p>
+              </div>
+              <Switch
+                checked={prefs.time_reminder_enabled}
+                disabled={loading || saving}
+                onCheckedChange={(v) => update('time_reminder_enabled', v)}
+              />
+            </div>
+            {prefs.time_reminder_enabled && (
+              <div className="space-y-2">
+                <Label htmlFor="custom-time" className="text-sm">Reminder time</Label>
+                <Input
+                  id="custom-time"
+                  type="time"
+                  value={prefs.time_reminder_at}
+                  onChange={(e) => update('time_reminder_at', e.target.value)}
                 />
               </div>
             )}
