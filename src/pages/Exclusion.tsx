@@ -107,6 +107,20 @@ const Exclusion = () => {
           <h1 className="text-2xl font-bold">Self-Exclusion</h1>
         </div>
 
+        <Card className="gentle-fade-in bg-gradient-to-br from-primary/10 to-accent/10">
+          <CardContent className="pt-6 space-y-3">
+            <h2 className="font-semibold flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" /> Lock yourself out of the app
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Pick a duration (24 hours up to 90 days). The app stays locked until the period ends.
+            </p>
+            <Button className="w-full" onClick={() => navigate('/exclusion/setup')}>
+              Start an exclusion period
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card className="gentle-fade-in">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

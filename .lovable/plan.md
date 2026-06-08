@@ -1,103 +1,72 @@
-# Plan: Native push, private avatars, Run-Now, polish pass
+# Recovery Cooler — Major Feature Pass
 
-This is a large scope. I'll deliver it in clearly scoped phases so you can stop me between any of them.
+This is a large request covering 7 areas. Here is the plan, grouped by feature. I will ship them in this order and check the build between groups.
 
----
+## 1. Onboarding tutorial (Breathing • Journaling • Cooldown)
+- Add a new `/onboarding/tutorial` flow with 4 slides:
+  1. Welcome + what RecoveryCooler does
+  2. Breathing — animated bubble + "Try a 30-sec breath" CTA
+  3. Journaling — show example entry + "Skip / Try it" buttons
+  4. Cooldown — explain urge surfing, big "Start Cooldown" CTA
+- Skip / Next / Back controls, dots progress, swipeable on mobile.
+- After last slide → `/home`. Store `tutorial_completed` flag in `profiles` so we don't show again.
 
-## Phase 1 — "Run Now" button (small, ships immediately)
+## 2. Weekly Progress Dashboard
+- New route `/progress/weekly` (also a card on `/progress`).
+- Summarizes the last 7 / 30 days:
+  - Cooldown sessions count (from `session_logs`)
+  - Meditation minutes (new `meditation_sessions` table)
+  - Goal adherence % (check-ins completed vs scheduled)
+  - Current streak / longest streak
+- Charts via existing `recharts` (bar + line).
 
-- Add a **Run Now** button to `NotificationsSettings.tsx` that calls `send-scheduled-notifications` with the service-role key.
-- Since the service-role key must NOT live in the browser, I'll add a thin authenticated edge function `trigger-checkin-now` that:
-  - Verifies the caller's JWT
-  - Server-side invokes `send-scheduled-notifications` with the service-role secret
-  - Forces delivery to **only the calling user** (override the hourly window check)
-- Toast shows result (`X notifications dispatched` / error).
+## 3. Journaling screen
+- The `Journal.tsx` page already exists. Polish:
+  - Daily prompt of the day
+  - Mood slider, gratitude field, free-form reflection
+  - Save to existing `journal_entries` table
+  - List of past entries with date filter
 
----
+## 4. Push notifications (spending + time reminders)
+- Use existing web-push + native FCM/APNs hook.
+- New `notification_schedules` rows for:
+  - Spending-limit alerts (triggers when daily total > limit)
+  - Time reminders (user-set HH:MM)
+- Edge function `send-scheduled-notifications` already exists — extend it to handle these two types and schedule via pg_cron every 5 min.
 
-## Phase 2 — Private avatars + signed URLs
+## 5. Self-exclusion lockout
+- Extend `self_exclusion_domains` purpose: add a new table `self_exclusion_periods` (start, end, reason).
+- New page `/exclusion/setup` to pick duration (24h, 7d, 30d, 90d, custom).
+- `<ExclusionGate>` wrapper checks for active period and renders a full-screen lockout (countdown + crisis resources + "Call helpline" button). Cannot be bypassed except by waiting; emergency contact always available.
 
-Migration:
-- Flip `avatars` bucket `public = false`.
-- Replace public-read policy with: authenticated users may read any avatar object (community feeds need to display them); only owners may insert/update/delete their own folder.
+## 6. Meditation soundtracks
+- Add a **Recovery Cooler Originals** section in `/meditation` with all 10 tracks (Spirit, One More Day, A New Chapter, Broken No More, I Choose Life, Scars Into Strength, Freedom From Chains, Rise Again, Road Back Home, Still Standing).
+- Each track embedded via YouTube IFrame (lazy-loaded) with cover art, title, play button.
+- Visual upgrade to existing meditation cards: gradient covers, duration, "Now playing" state, looped background option.
 
-Code changes:
-- New helper `src/lib/avatarUrl.ts` → `getSignedAvatarUrl(path, ttl=3600)` with in-memory LRU cache.
-- New hook `useAvatarUrl(path)` returning a signed URL, refreshing before expiry.
-- Replace every `getPublicUrl('avatars', …)` / direct `avatar_url` usage. Touched files (will re-grep before editing): `Profile.tsx`, `Community.tsx`, `ForumPostDetail.tsx`, `AccountabilityPartners.tsx`, `BottomNav.tsx`, `AppReviews.tsx`, `ShareJourney.tsx`, anywhere else `avatar_url` is read.
-- Mark the linter "public bucket" finding as fixed; update security memory.
+## 7. Share My Recovery Journey
+- New table `public_journeys`:
+  - `user_id`, `slug` (unique, default = username or random), `is_public`, `nickname`, `story`, `show_avatar`, `show_streak`, `show_milestones`, `show_achievements`
+- New public route `/journey/:slug` (no auth required, public RLS read on `public_journeys` where `is_public = true`).
+  - Shows: avatar (signed URL OK), nickname, days-sober counter, milestones, story, public achievements, rotating inspirational quote.
+- New `/profile/share` settings page: toggle public, edit slug, edit story, pick what to show.
+- Share button (existing `ShareJourney` component) updated to use `https://recoverycooler.lovable.app/journey/{slug}` with WhatsApp / Facebook / X / Copy.
+- URLs are slug-based so a custom domain can be swapped in later with zero link changes.
 
-Trade-off you accepted: every avatar render now waits on a signed-URL request (cached for 55 min). Slight latency and more client code.
+## Database migrations (one batch)
+- `ALTER profiles ADD tutorial_completed boolean default false`
+- `CREATE TABLE meditation_sessions`
+- `CREATE TABLE self_exclusion_periods`
+- `CREATE TABLE public_journeys` + anon SELECT policy for `is_public = true`
+- `ALTER notification_preferences` add `spending_alerts`, `time_reminder_enabled`, `time_reminder_at`
 
----
-
-## Phase 3 — Native FCM (Android) + APNs (iOS) push
-
-### Secrets you'll need to provide
-1. **`FCM_SERVICE_ACCOUNT_JSON`** — full Firebase service account JSON (from Firebase Console → Project Settings → Service Accounts → Generate new private key).
-2. **`APNS_AUTH_KEY_P8`** — contents of your `.p8` file (from Apple Developer → Keys).
-3. **`APNS_KEY_ID`** — 10-char key ID.
-4. **`APNS_TEAM_ID`** — 10-char Apple team ID.
-5. **`APNS_BUNDLE_ID`** — e.g. `app.lovable.e67e4c3e112141a298bae8d6f113f820`.
-6. **`APNS_USE_SANDBOX`** — `true` for TestFlight/dev, `false` for App Store.
-
-I'll request these via the secrets tool **after you approve this plan** (and won't proceed past Phase 3 until they're added).
-
-### Database
-- New table `device_tokens(user_id, platform 'ios'|'android'|'web', token unique, created_at, last_seen_at)` with owner-scoped RLS. The existing `push_subscriptions` table stays for web push.
-
-### Edge function `send-push` (new)
-- Accepts `{ user_ids[], title, body, data? }` from internal callers (service-role only).
-- Looks up `device_tokens` per user.
-- For Android: signs a Google OAuth2 token from the service account JWT, POSTs to FCM HTTP v1 (`https://fcm.googleapis.com/v1/projects/<id>/messages:send`).
-- For iOS: builds an APNs JWT (ES256) from the .p8, POSTs to `api.push.apple.com` (or sandbox) with `:authority`/headers.
-- For web: existing VAPID path.
-- Removes invalid tokens on `404`/`410`/`Unregistered`.
-
-### Hourly cron + Run-Now
-- `send-scheduled-notifications` is updated to call `send-push` instead of the placeholder logger.
-
-### Client (Capacitor)
-- `useNativePushNotifications` already exists; I'll fix it to write to the new `device_tokens` table with the correct `platform` and to register an APNs token on iOS too.
-- Settings → Notifications page gains a **"Native delivery status"** card: shows platform detected, registration state, last token tail (last 8 chars), and a **Re-register** button.
-
-### What you must do locally
-After Phase 3 ships you'll need to:
-1. `git pull` your repo
-2. `bun install`
-3. `npx cap sync`
-4. For iOS: open Xcode, enable **Push Notifications** + **Background Modes → Remote notifications** capability, then run on device.
-5. For Android: drop your `google-services.json` into `android/app/`.
-
-I cannot do those native steps from inside Lovable.
-
----
-
-## Phase 4 — Whole-app polish pass
-
-I'll audit and report back **before** mass-editing. Scope:
-- Loading states / skeletons on every data-fetching page.
-- Empty states with a CTA (Journal, Community, Partners, Spending, Triggers, Coping Strategies, etc.).
-- Error toasts on every `await supabase…` mutation.
-- Accessibility: `aria-label`s on icon-only buttons, focus rings, alt text.
-- Mobile spacing under the bubble bottom nav (`pb-24` consistency).
-- Dead routes / broken links sweep.
-- SEO tags (`<title>`, meta description, single H1) on each page.
-
-Deliverable for Phase 4 step 1: a checklist comment in chat. Then I implement what you green-light.
-
----
-
-## Order of execution
-1. Phase 1 (ships in this turn)
-2. Phase 2 migration + code (this turn)
-3. Phase 3 — request secrets, then build (next turn after you add them)
-4. Phase 4 — audit report, then incremental fixes
+All tables get the required GRANTs + RLS + policies.
 
 ## Technical notes
-- APNs JWT and Google service-account JWT are both signed with `crypto.subtle` in Deno; no extra deps.
-- `device_tokens.token` is unique; upserts handle re-registration cleanly.
-- Service-role key is never sent to the browser; `trigger-checkin-now` is the only user-facing entry point.
-- Migration also revokes `EXECUTE` on `notify_required_update` from `anon`/`authenticated` (defense in depth for SECURITY DEFINER).
+- Reuse existing components (`Card`, `Button`, `Slider`, `BottomNav`, `useHapticFeedback`).
+- No design-token violations — semantic colors only.
+- Avatars stay private; public journey uses signed URLs refreshed server-side via an edge function `get-public-journey`.
+- No third-party deps added — YouTube via iframe.
+- Estimated ~20 new/edited files plus 1 SQL migration.
 
-Approve and I'll start with Phases 1 + 2 immediately.
+Reply **approve** and I'll start with the migration, then ship the features in the order above.
