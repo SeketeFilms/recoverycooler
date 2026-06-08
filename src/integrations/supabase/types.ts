@@ -453,6 +453,33 @@ export type Database = {
         }
         Relationships: []
       }
+      meditation_sessions: {
+        Row: {
+          completed: boolean
+          created_at: string
+          duration_minutes: number
+          id: string
+          track_name: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          track_name?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          track_name?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           checkin_time: string | null
@@ -461,6 +488,9 @@ export type Database = {
           meditation_reminders: boolean | null
           meditation_time: string | null
           recovery_checkins: boolean | null
+          spending_alerts: boolean | null
+          time_reminder_at: string | null
+          time_reminder_enabled: boolean | null
           updated_at: string
           user_id: string
         }
@@ -471,6 +501,9 @@ export type Database = {
           meditation_reminders?: boolean | null
           meditation_time?: string | null
           recovery_checkins?: boolean | null
+          spending_alerts?: boolean | null
+          time_reminder_at?: string | null
+          time_reminder_enabled?: boolean | null
           updated_at?: string
           user_id: string
         }
@@ -481,6 +514,9 @@ export type Database = {
           meditation_reminders?: boolean | null
           meditation_time?: string | null
           recovery_checkins?: boolean | null
+          spending_alerts?: boolean | null
+          time_reminder_at?: string | null
+          time_reminder_enabled?: boolean | null
           updated_at?: string
           user_id?: string
         }
@@ -525,6 +561,7 @@ export type Database = {
           full_name: string | null
           gender: string | null
           id: string
+          tutorial_completed: boolean
           updated_at: string
           user_id: string
           username: string | null
@@ -537,6 +574,7 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id?: string
+          tutorial_completed?: boolean
           updated_at?: string
           user_id: string
           username?: string | null
@@ -549,6 +587,7 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id?: string
+          tutorial_completed?: boolean
           updated_at?: string
           user_id?: string
           username?: string | null
@@ -586,6 +625,51 @@ export type Database = {
           last_check_in?: string | null
           longest_streak?: number
           total_check_ins?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      public_journeys: {
+        Row: {
+          created_at: string
+          id: string
+          is_public: boolean
+          nickname: string | null
+          show_achievements: boolean
+          show_avatar: boolean
+          show_milestones: boolean
+          show_streak: boolean
+          slug: string
+          story: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          nickname?: string | null
+          show_achievements?: boolean
+          show_avatar?: boolean
+          show_milestones?: boolean
+          show_streak?: boolean
+          slug: string
+          story?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          nickname?: string | null
+          show_achievements?: boolean
+          show_avatar?: boolean
+          show_milestones?: boolean
+          show_streak?: boolean
+          slug?: string
+          story?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -710,6 +794,36 @@ export type Database = {
           created_at?: string
           domain?: string
           id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      self_exclusion_periods: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          is_active: boolean
+          reason: string | null
+          starts_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          starts_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          starts_at?: string
           user_id?: string
         }
         Relationships: []
