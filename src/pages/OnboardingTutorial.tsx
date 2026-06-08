@@ -50,13 +50,13 @@ const OnboardingTutorial = () => {
   };
 
   const next = () => {
-    triggerLight();
+    trigger('light');
     if (last) finish();
     else setIndex(index + 1);
   };
 
   const back = () => {
-    triggerLight();
+    trigger('light');
     if (index > 0) setIndex(index - 1);
   };
 
