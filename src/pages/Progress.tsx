@@ -371,6 +371,8 @@ const Progress = () => {
             </Button>
             <h1 className="text-2xl font-bold">Your Progress</h1>
           </div>
+          <Button variant="outline" size="sm" onClick={() => navigate('/progress/weekly')}>
+            <TrendingUp className="h-4 w-4 mr-2" /> Weekly
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="text-destructive border-destructive/50 hover:bg-destructive/10">
