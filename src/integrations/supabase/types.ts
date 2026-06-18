@@ -635,6 +635,7 @@ export type Database = {
           created_at: string
           id: string
           is_public: boolean
+          moderation_status: string
           nickname: string | null
           show_achievements: boolean
           show_avatar: boolean
@@ -649,6 +650,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_public?: boolean
+          moderation_status?: string
           nickname?: string | null
           show_achievements?: boolean
           show_avatar?: boolean
@@ -663,6 +665,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_public?: boolean
+          moderation_status?: string
           nickname?: string | null
           show_achievements?: boolean
           show_avatar?: boolean
