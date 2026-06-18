@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Flame, Trophy, Heart, Share2, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { getSignedAvatarUrl } from '@/lib/avatarUrl';
+import { ReportContentDialog } from '@/components/ReportContentDialog';
 
 const QUOTES = [
   'Every day clean is a victory worth celebrating.',
@@ -18,6 +19,7 @@ const QUOTES = [
 ];
 
 interface JourneyData {
+  id: string;
   nickname: string | null;
   story: string | null;
   show_avatar: boolean;
@@ -194,7 +196,13 @@ const PublicJourney = () => {
           </CardContent>
         </Card>
 
-        <div className="text-center pt-4">
+        <div className="flex flex-col items-center gap-3 pt-4">
+          <ReportContentDialog
+            contentType="public_journey"
+            contentId={journey.id}
+            triggerLabel="Report this journey"
+            variant="ghost"
+          />
           <Link to="/" className="text-sm text-primary hover:underline">
             Start your own recovery — RecoveryCooler
           </Link>

@@ -53,6 +53,7 @@ import WeeklyDashboard from "./pages/WeeklyDashboard";
 import ExclusionSetup from "./pages/ExclusionSetup";
 import PublicJourney from "./pages/PublicJourney";
 import ShareSettings from "./pages/ShareSettings";
+import AdminReports from "./pages/AdminReports";
 import { ExclusionGate } from "./components/ExclusionGate";
 
 // Wrapper for swipeable main routes
@@ -99,6 +100,7 @@ const AppContent = () => {
         <Route path="/progress/weekly" element={<ProtectedRoute><WeeklyDashboard /></ProtectedRoute>} />
         <Route path="/exclusion/setup" element={<ProtectedRoute><ExclusionSetup /></ProtectedRoute>} />
         <Route path="/share-settings" element={<ProtectedRoute><ShareSettings /></ProtectedRoute>} />
+        <Route path="/admin/reports" element={<ProtectedRoute><AdminReports /></ProtectedRoute>} />
         <Route
           path="/home"
           element={
