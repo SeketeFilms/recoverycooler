@@ -49,12 +49,19 @@ const AdminReports = () => {
     setReports((data ?? []) as Report[]);
   };
 
-  const updateReport = async (id: string, status: 'reviewed' | 'dismissed') => {
+  const logAction = async (journey_id: string | null, report_id: string | null, action: string, notes?: string) => {
+    await (supabase as any).from('moderation_actions').insert({
+      journey_id, report_id, admin_id: user!.id, action, notes: notes ?? null,
+    });
+  };
+
+  const updateReport = async (r: Report, status: 'reviewed' | 'dismissed') => {
     const { error } = await supabase
       .from('content_reports')
       .update({ status, reviewed_by: user?.id, reviewed_at: new Date().toISOString() })
-      .eq('id', id);
+      .eq('id', r.id);
     if (error) { toast.error('Failed'); return; }
+    await logAction(r.content_type === 'public_journey' ? r.content_id : null, r.id, status);
     toast.success('Updated');
     load();
   };
@@ -66,12 +73,23 @@ const AdminReports = () => {
     }
     const { error } = await supabase
       .from('public_journeys')
-      .update({ moderation_status: 'hidden', is_public: false })
+      .update({ moderation_status: 'hidden', is_public: false } as any)
       .eq('id', r.content_id);
     if (error) { toast.error('Could not hide'); return; }
-    await updateReport(r.id, 'reviewed');
+    await logAction(r.content_id, r.id, 'hidden');
+    // Notify journey owner
+    const { data: j } = await supabase.from('public_journeys').select('user_id').eq('id', r.content_id).maybeSingle();
+    if (j?.user_id) {
+      await (supabase as any).from('notifications').insert({
+        recipient_id: j.user_id, actor_id: user!.id, type: 'moderation',
+        target_type: 'public_journey', target_id: r.content_id,
+        data: { message: 'Your public journey was hidden by moderators. You can appeal in Share Settings.' },
+      });
+    }
+    await updateReport(r, 'reviewed');
     toast.success('Journey hidden');
   };
+
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
