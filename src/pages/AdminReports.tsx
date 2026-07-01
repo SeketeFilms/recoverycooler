@@ -161,12 +161,13 @@ const AdminReports = () => {
                         <EyeOff className="h-4 w-4 mr-2" /> Hide journey
                       </Button>
                     )}
-                    <Button size="sm" variant="outline" onClick={() => updateReport(r.id, 'reviewed')}>
+                    <Button size="sm" variant="outline" onClick={() => updateReport(r, 'reviewed')}>
                       <Check className="h-4 w-4 mr-2" /> Mark reviewed
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => updateReport(r.id, 'dismissed')}>
+                    <Button size="sm" variant="ghost" onClick={() => updateReport(r, 'dismissed')}>
                       <X className="h-4 w-4 mr-2" /> Dismiss
                     </Button>
+
                   </div>
                 )}
               </CardContent>
