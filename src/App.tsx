@@ -54,6 +54,11 @@ import ExclusionSetup from "./pages/ExclusionSetup";
 import PublicJourney from "./pages/PublicJourney";
 import ShareSettings from "./pages/ShareSettings";
 import AdminReports from "./pages/AdminReports";
+import AdminModerators from "./pages/AdminModerators";
+import AdminAppeals from "./pages/AdminAppeals";
+import AppealJourney from "./pages/AppealJourney";
+import Notifications from "./pages/Notifications";
+
 import { ExclusionGate } from "./components/ExclusionGate";
 
 // Wrapper for swipeable main routes
@@ -101,6 +106,11 @@ const AppContent = () => {
         <Route path="/exclusion/setup" element={<ProtectedRoute><ExclusionSetup /></ProtectedRoute>} />
         <Route path="/share-settings" element={<ProtectedRoute><ShareSettings /></ProtectedRoute>} />
         <Route path="/admin/reports" element={<ProtectedRoute><AdminReports /></ProtectedRoute>} />
+        <Route path="/admin/moderators" element={<ProtectedRoute><AdminModerators /></ProtectedRoute>} />
+        <Route path="/admin/appeals" element={<ProtectedRoute><AdminAppeals /></ProtectedRoute>} />
+        <Route path="/journey/appeal" element={<ProtectedRoute><AppealJourney /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+
         <Route
           path="/home"
           element={

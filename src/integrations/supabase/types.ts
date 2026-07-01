@@ -453,6 +453,146 @@ export type Database = {
         }
         Relationships: []
       }
+      journey_appeals: {
+        Row: {
+          created_at: string
+          decision_notes: string | null
+          id: string
+          journey_id: string
+          message: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision_notes?: string | null
+          id?: string
+          journey_id: string
+          message: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decision_notes?: string | null
+          id?: string
+          journey_id?: string
+          message?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_appeals_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "public_journeys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journey_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          journey_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          journey_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          journey_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_comments_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "public_journeys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journey_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          id: string
+          journey_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          id?: string
+          journey_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          id?: string
+          journey_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_follows_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "public_journeys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journey_likes: {
+        Row: {
+          created_at: string
+          id: string
+          journey_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          journey_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          journey_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_likes_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "public_journeys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meditation_sessions: {
         Row: {
           completed: boolean
@@ -479,6 +619,51 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      moderation_actions: {
+        Row: {
+          action: string
+          admin_id: string | null
+          created_at: string
+          id: string
+          journey_id: string | null
+          notes: string | null
+          report_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          created_at?: string
+          id?: string
+          journey_id?: string | null
+          notes?: string | null
+          report_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          created_at?: string
+          id?: string
+          journey_id?: string | null
+          notes?: string | null
+          report_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_actions_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "public_journeys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderation_actions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "content_reports"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notification_preferences: {
         Row: {
@@ -519,6 +704,42 @@ export type Database = {
           time_reminder_enabled?: boolean | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          data: Json
+          id: string
+          read_at: string | null
+          recipient_id: string
+          target_id: string | null
+          target_type: string | null
+          type: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          read_at?: string | null
+          recipient_id: string
+          target_id?: string | null
+          target_type?: string | null
+          type: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          read_at?: string | null
+          recipient_id?: string
+          target_id?: string | null
+          target_type?: string | null
+          type?: string
         }
         Relationships: []
       }
