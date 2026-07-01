@@ -9,6 +9,8 @@ import { Flame, Trophy, Heart, Share2, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { getSignedAvatarUrl } from '@/lib/avatarUrl';
 import { ReportContentDialog } from '@/components/ReportContentDialog';
+import { JourneyInteractions } from '@/components/JourneyInteractions';
+
 
 const QUOTES = [
   'Every day clean is a victory worth celebrating.',
