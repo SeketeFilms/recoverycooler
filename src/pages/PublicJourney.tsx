@@ -176,6 +176,9 @@ const PublicJourney = () => {
           </CardContent>
         </Card>
 
+        <JourneyInteractions journeyId={journey.id} ownerId={journey.user_id} />
+
+
         <Card>
           <CardContent className="pt-6 space-y-2">
             <p className="text-sm font-semibold flex items-center gap-2">
