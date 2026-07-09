@@ -310,7 +310,7 @@ export const RecoveryCoolerTracks = () => {
                   <span className="max-w-[140px] truncate">{t.title}</span>
                   <span className="font-mono text-muted-foreground">{t.duration}</span>
                   <button
-                    onClick={() => setQueue((q) => q.filter((_, idx) => idx !== i))}
+                    onClick={() => api.removeAt(i)}
                     className="text-muted-foreground hover:text-destructive"
                     aria-label="Remove from queue"
                   >
