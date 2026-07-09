@@ -299,7 +299,7 @@ export const RecoveryCoolerTracks = () => {
               <div className="flex items-center gap-2 font-medium text-sm">
                 <ListMusic className="h-4 w-4" /> Play Queue ({queue.length})
               </div>
-              <Button size="sm" variant="ghost" onClick={() => setQueue([])}>
+              <Button size="sm" variant="ghost" onClick={() => api.clear()}>
                 <Trash2 className="h-3 w-3 mr-1" /> Clear
               </Button>
             </div>
