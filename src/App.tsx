@@ -297,6 +297,13 @@ const AppContent = () => {
           }
         />
         <Route
+          path="/meditation/access"
+          element={
+            <ProtectedRoute>
+              <MeditationAccess />
+            </ProtectedRoute>
+          }
+        />
           path="/partners"
           element={
             <ProtectedRoute>
