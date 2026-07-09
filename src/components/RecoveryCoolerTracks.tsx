@@ -12,12 +12,14 @@ import {
   Coffee,
   ListMusic,
   SkipForward,
+  SkipBack,
   Trash2,
   Plus,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useTrackQueue } from '@/hooks/useTrackQueue';
 
 interface Track {
   title: string;
