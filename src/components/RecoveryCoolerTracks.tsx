@@ -336,6 +336,11 @@ export const RecoveryCoolerTracks = () => {
                 <p className="text-xs text-white/70">{playing.tag} · {playing.duration}</p>
               </div>
               <div className="flex gap-1 shrink-0">
+                {history.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={playPrev} className="text-white hover:bg-white/10">
+                    <SkipBack className="h-4 w-4 mr-1" /> Prev
+                  </Button>
+                )}
                 {queue.length > 0 && (
                   <Button variant="ghost" size="sm" onClick={playNext} className="text-white hover:bg-white/10">
                     <SkipForward className="h-4 w-4 mr-1" /> Next ({queue.length})
