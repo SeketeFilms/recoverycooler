@@ -1,24 +1,51 @@
-import { Home, AlertCircle, DollarSign, User, Settings } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Home, AlertCircle, DollarSign, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { getSignedAvatarUrl } from '@/lib/avatarUrl';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { trigger } = useHapticFeedback();
+  const { user } = useAuth();
+  const [avatarSrc, setAvatarSrc] = useState<string>('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!user) return setAvatarSrc('');
+      const { data } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      const stored = data?.avatar_url;
+      if (!stored) return;
+      const signed = await getSignedAvatarUrl(stored);
+      if (!cancelled && signed) setAvatarSrc(signed);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const handleNavClick = (path: string) => {
     trigger('medium');
     navigate(path);
   };
 
+  const initial = (user?.email?.[0] || 'U').toUpperCase();
+
   const navItems = [
     { icon: Home, label: 'Home', path: '/home' },
     { icon: AlertCircle, label: 'Cooldown', path: '/cooldown' },
     { icon: DollarSign, label: 'Spending', path: '/spending' },
-    { icon: User, label: 'Profile', path: '/profile' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
+    { icon: User, label: 'Profile', path: '/profile', isProfile: true },
   ];
 
   return (
