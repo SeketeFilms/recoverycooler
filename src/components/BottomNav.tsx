@@ -67,7 +67,14 @@ const BottomNav = () => {
                     : "text-muted-foreground hover:text-foreground hover:scale-102 hover:bg-muted/50"
                 )}
               >
-                <Icon className={cn("h-5 w-5", isActive && "drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]")} />
+                {item.isProfile ? (
+                  <Avatar className={cn("h-6 w-6 border", isActive && "ring-2 ring-primary")}>
+                    {avatarSrc && <AvatarImage src={avatarSrc} alt="Profile" />}
+                    <AvatarFallback className="text-[10px]">{initial}</AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Icon className={cn("h-5 w-5", isActive && "drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]")} />
+                )}
                 <span className="text-[10px] font-semibold leading-tight">{item.label}</span>
               </button>
             );
