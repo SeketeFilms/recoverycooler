@@ -58,6 +58,7 @@ import AdminModerators from "./pages/AdminModerators";
 import AdminAppeals from "./pages/AdminAppeals";
 import AppealJourney from "./pages/AppealJourney";
 import Notifications from "./pages/Notifications";
+import MeditationAccess from "./pages/MeditationAccess";
 
 import { ExclusionGate } from "./components/ExclusionGate";
 
@@ -68,7 +69,7 @@ const SwipeableRoute = ({ children }: { children: React.ReactNode }) => (
   </ProtectedRoute>
 );
 
-const MAIN_ROUTES = ['/home', '/cooldown', '/spending', '/profile', '/settings'];
+const MAIN_ROUTES = ['/home', '/cooldown', '/spending', '/profile'];
 
 // Bottom nav shown only on main routes
 const MainRouteBottomNav = () => {
