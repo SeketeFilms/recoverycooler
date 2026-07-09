@@ -11,6 +11,18 @@ import OfflineIndicator from '@/components/OfflineIndicator';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { RecoveryCoolerTracks } from '@/components/RecoveryCoolerTracks';
 
+const breathingSteps = [
+  "Take a slow, deep breath in through your nose for 4 counts...",
+  "Hold your breath gently for 4 counts...",
+  "Exhale slowly through your mouth for 6 counts...",
+  "Notice how your body feels. You're doing great.",
+  "Name 3 things you can see around you...",
+  "Name 3 things you can hear right now...",
+  "Feel your feet on the ground. You are safe.",
+  "This urge is temporary. It will pass.",
+  "You are stronger than you think.",
+  "Take another deep breath. You've got this.",
+];
 
 const Cooldown = () => {
   const [currentStep, setCurrentStep] = useState(0);
