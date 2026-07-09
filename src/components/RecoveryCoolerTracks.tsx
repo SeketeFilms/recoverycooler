@@ -80,6 +80,13 @@ const TrackCard = ({ track, locked, onPlay, onQueue }: TrackCardProps) => (
         src={thumb(track.youtubeId)}
         alt={track.title}
         loading="lazy"
+        onError={(e) => {
+          const img = e.currentTarget;
+          if (!img.dataset.fallback) {
+            img.dataset.fallback = '1';
+            img.src = thumbFallback(track.youtubeId);
+          }
+        }}
         className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -87,7 +94,7 @@ const TrackCard = ({ track, locked, onPlay, onQueue }: TrackCardProps) => (
         {track.tag}
       </Badge>
       <span className="absolute bottom-2 right-2 text-[11px] font-mono text-white bg-black/60 rounded px-1.5 py-0.5">
-        {track.duration}
+        {track.duration || DEFAULT_DURATION}
       </span>
       <button
         onClick={locked ? undefined : onPlay}
