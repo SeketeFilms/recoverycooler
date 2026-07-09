@@ -169,9 +169,9 @@ const PlaylistColumn = ({ title, subtitle, tracks, locked, onPlay, onQueue, onUn
 export const RecoveryCoolerTracks = () => {
   const { user } = useAuth();
   const [playing, setPlaying] = useState<Track | null>(null);
-  const [queue, setQueue] = useState<Track[]>([]);
   const [search, setSearch] = useState('');
   const [view, setView] = useState<ViewMode>('all');
+  const { queue, history, api } = useTrackQueue();
 
   const isOwner = !!user?.email && OWNER_EMAILS.includes(user.email.toLowerCase());
   const [donor, setDonor] = useState<boolean>(
@@ -186,6 +186,7 @@ export const RecoveryCoolerTracks = () => {
   const ambientFiltered = useMemo(() => filter(AMBIENT_TRACKS), [search]);
 
   const play = async (t: Track) => {
+    if (playing) api.pushHistory(playing);
     setPlaying(t);
     if (user) {
       await supabase.from('meditation_sessions').insert({
@@ -197,17 +198,23 @@ export const RecoveryCoolerTracks = () => {
   };
 
   const addToQueue = (t: Track) => {
-    setQueue((q) => [...q, t]);
+    api.add(t);
     toast.success(`Added "${t.title}" to queue`);
   };
 
   const playNext = () => {
-    setQueue((q) => {
-      const [next, ...rest] = q;
-      if (next) setPlaying(next);
-      else setPlaying(null);
-      return rest;
-    });
+    const next = api.shiftNext();
+    if (next) {
+      if (playing) api.pushHistory(playing);
+      setPlaying(next as Track);
+    } else {
+      setPlaying(null);
+    }
+  };
+
+  const playPrev = () => {
+    const prev = api.popHistory();
+    if (prev) setPlaying(prev as Track);
   };
 
   const unlockOfficial = () => {
