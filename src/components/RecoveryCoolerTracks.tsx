@@ -281,7 +281,7 @@ export const RecoveryCoolerTracks = () => {
         {(view === 'all' || view === 'official') && (
           <PlaylistColumn
             title="Playlist 2 · Recovery Cooler Officials"
-            subtitle={officialLocked ? 'For Coffee Givers ☕ — 10 official soundtracks' : '10 official soundtracks'}
+            subtitle={officialLocked ? '10 official soundtracks · locked' : '10 official soundtracks'}
             tracks={officialFiltered}
             locked={officialLocked}
             onPlay={play}
