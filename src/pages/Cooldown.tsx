@@ -9,41 +9,8 @@ import { Slider } from '@/components/ui/slider';
 
 import OfflineIndicator from '@/components/OfflineIndicator';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { RecoveryCoolerTracks } from '@/components/RecoveryCoolerTracks';
 
-const breathingSteps = [
-  "Take a slow, deep breath in through your nose for 4 counts...",
-  "Hold your breath gently for 4 counts...",
-  "Exhale slowly through your mouth for 6 counts...",
-  "Notice how your body feels. You're doing great.",
-  "Name 3 things you can see around you...",
-  "Name 3 things you can hear right now...",
-  "Feel your feet on the ground. You are safe.",
-  "This urge is temporary. It will pass.",
-  "You are stronger than you think.",
-  "Take another deep breath. You've got this.",
-];
-
-const meditationTracks = [
-  { name: 'Recovery Cooler — Spirit', videoId: 'oVut93mr3Ls' },
-  { name: 'Recovery Cooler — One More Day', videoId: 'la0iDPyWBI0' },
-  { name: 'Recovery Cooler — A New Chapter', videoId: 'vZtOwJ0iyFo' },
-  { name: 'Recovery Cooler — Broken No More', videoId: 'yf8arcYQ5vA' },
-  { name: 'Recovery Cooler — I Choose Life', videoId: '3p99WKrKCzs' },
-  { name: 'Recovery Cooler — Scars Into Strength', videoId: 'Ioky_yUQRL0' },
-  { name: 'Recovery Cooler — Freedom From Chains', videoId: '54eogc2IN8k' },
-  { name: 'Recovery Cooler — Rise Again', videoId: 'nwJoaPtQg0I' },
-  { name: 'Recovery Cooler — Road Back Home', videoId: 'ImQFm_S6Fqo' },
-  { name: 'Recovery Cooler — Still Standing', videoId: 'HXAkx3lV2hU' },
-  { name: 'Night Water Flow 1', videoId: 'I9lq8gIp5es' },
-  { name: 'Night Water Flow 2', videoId: 'X3TabauC0uk' },
-  { name: 'Night Water Flow 3', videoId: 'JUDmFnqbrb8' },
-  { name: 'Power Water Meditation 1', videoId: '81O5_-sFWGw' },
-  { name: 'Power Water Meditation 2', videoId: 'QBl5rd-EJB4' },
-  { name: 'Power Water Meditation 3', videoId: 'mzSeBjLGqu4' },
-  { name: 'Rain & Calm Energy 1', videoId: 'M2zYCg4ExMs' },
-  { name: 'Rain & Calm Energy 2', videoId: '8reUL35jWUU' },
-  { name: 'Rain & Calm Energy 3', videoId: 'zGjLmtH38o0' },
-];
 
 const Cooldown = () => {
   const [currentStep, setCurrentStep] = useState(0);
