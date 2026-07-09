@@ -56,11 +56,13 @@ const AMBIENT_TRACKS: Track[] = [
   { title: 'Rain & Calm Energy 3', youtubeId: 'zGjLmtH38o0', duration: '10:00', gradient: 'from-purple-500/40 to-fuchsia-500/40', tag: 'Ambient' },
 ];
 
-const OWNER_EMAILS = ['seketefilstv@gmail.com'];
+const OWNER_EMAILS = ['seketefilmstv@gmail.com'];
 const DONOR_LOCAL_KEY = 'rc_coffee_giver';
 const COFFEE_URL = 'https://www.paypal.com/paypalme/seketefilms';
+const DEFAULT_DURATION = '—:—';
 
 const thumb = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+const thumbFallback = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
 type ViewMode = 'all' | 'official' | 'ambient';
 
