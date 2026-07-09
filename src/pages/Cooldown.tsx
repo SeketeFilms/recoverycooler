@@ -24,6 +24,16 @@ const breathingSteps = [
 ];
 
 const meditationTracks = [
+  { name: 'Recovery Cooler — Spirit', videoId: 'oVut93mr3Ls' },
+  { name: 'Recovery Cooler — One More Day', videoId: 'la0iDPyWBI0' },
+  { name: 'Recovery Cooler — A New Chapter', videoId: 'vZtOwJ0iyFo' },
+  { name: 'Recovery Cooler — Broken No More', videoId: 'yf8arcYQ5vA' },
+  { name: 'Recovery Cooler — I Choose Life', videoId: '3p99WKrKCzs' },
+  { name: 'Recovery Cooler — Scars Into Strength', videoId: 'Ioky_yUQRL0' },
+  { name: 'Recovery Cooler — Freedom From Chains', videoId: '54eogc2IN8k' },
+  { name: 'Recovery Cooler — Rise Again', videoId: 'nwJoaPtQg0I' },
+  { name: 'Recovery Cooler — Road Back Home', videoId: 'ImQFm_S6Fqo' },
+  { name: 'Recovery Cooler — Still Standing', videoId: 'HXAkx3lV2hU' },
   { name: 'Night Water Flow 1', videoId: 'I9lq8gIp5es' },
   { name: 'Night Water Flow 2', videoId: 'X3TabauC0uk' },
   { name: 'Night Water Flow 3', videoId: 'JUDmFnqbrb8' },
