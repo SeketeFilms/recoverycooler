@@ -304,6 +304,7 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+        <Route
           path="/partners"
           element={
             <ProtectedRoute>
