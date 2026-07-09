@@ -358,7 +358,7 @@ const Home = () => {
         </Button>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <Button 
             variant="outline"
             className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-destructive/10 hover:border-destructive/50 transition-all"
@@ -366,16 +366,6 @@ const Home = () => {
           >
             <AlertCircle className="h-6 w-6 text-destructive" />
             <span className="text-sm font-medium">Need Help Now</span>
-          </Button>
-          <Button 
-            variant="outline"
-            className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
-            onClick={() => navigate('/spending')}
-          >
-            <DollarSign className="h-6 w-6" />
-            <span className="text-sm font-medium">
-              {addictionType === 'gambling' ? 'Spending Tracker' : 'Alcohol Spending'}
-            </span>
           </Button>
         </div>
 

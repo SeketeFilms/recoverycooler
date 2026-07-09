@@ -12,12 +12,14 @@ import {
   Coffee,
   ListMusic,
   SkipForward,
+  SkipBack,
   Trash2,
   Plus,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useTrackQueue } from '@/hooks/useTrackQueue';
 
 interface Track {
   title: string;
@@ -54,11 +56,13 @@ const AMBIENT_TRACKS: Track[] = [
   { title: 'Rain & Calm Energy 3', youtubeId: 'zGjLmtH38o0', duration: '10:00', gradient: 'from-purple-500/40 to-fuchsia-500/40', tag: 'Ambient' },
 ];
 
-const OWNER_EMAILS = ['seketefilstv@gmail.com'];
+const OWNER_EMAILS = ['seketefilmstv@gmail.com'];
 const DONOR_LOCAL_KEY = 'rc_coffee_giver';
 const COFFEE_URL = 'https://www.paypal.com/paypalme/seketefilms';
+const DEFAULT_DURATION = '—:—';
 
 const thumb = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+const thumbFallback = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
 type ViewMode = 'all' | 'official' | 'ambient';
 
@@ -76,6 +80,13 @@ const TrackCard = ({ track, locked, onPlay, onQueue }: TrackCardProps) => (
         src={thumb(track.youtubeId)}
         alt={track.title}
         loading="lazy"
+        onError={(e) => {
+          const img = e.currentTarget;
+          if (!img.dataset.fallback) {
+            img.dataset.fallback = '1';
+            img.src = thumbFallback(track.youtubeId);
+          }
+        }}
         className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -83,7 +94,7 @@ const TrackCard = ({ track, locked, onPlay, onQueue }: TrackCardProps) => (
         {track.tag}
       </Badge>
       <span className="absolute bottom-2 right-2 text-[11px] font-mono text-white bg-black/60 rounded px-1.5 py-0.5">
-        {track.duration}
+        {track.duration || DEFAULT_DURATION}
       </span>
       <button
         onClick={locked ? undefined : onPlay}
@@ -158,9 +169,9 @@ const PlaylistColumn = ({ title, subtitle, tracks, locked, onPlay, onQueue, onUn
 export const RecoveryCoolerTracks = () => {
   const { user } = useAuth();
   const [playing, setPlaying] = useState<Track | null>(null);
-  const [queue, setQueue] = useState<Track[]>([]);
   const [search, setSearch] = useState('');
   const [view, setView] = useState<ViewMode>('all');
+  const { queue, history, api } = useTrackQueue();
 
   const isOwner = !!user?.email && OWNER_EMAILS.includes(user.email.toLowerCase());
   const [donor, setDonor] = useState<boolean>(
@@ -175,6 +186,7 @@ export const RecoveryCoolerTracks = () => {
   const ambientFiltered = useMemo(() => filter(AMBIENT_TRACKS), [search]);
 
   const play = async (t: Track) => {
+    if (playing) api.pushHistory(playing);
     setPlaying(t);
     if (user) {
       await supabase.from('meditation_sessions').insert({
@@ -186,17 +198,23 @@ export const RecoveryCoolerTracks = () => {
   };
 
   const addToQueue = (t: Track) => {
-    setQueue((q) => [...q, t]);
+    api.add(t);
     toast.success(`Added "${t.title}" to queue`);
   };
 
   const playNext = () => {
-    setQueue((q) => {
-      const [next, ...rest] = q;
-      if (next) setPlaying(next);
-      else setPlaying(null);
-      return rest;
-    });
+    const next = api.shiftNext();
+    if (next) {
+      if (playing) api.pushHistory(playing);
+      setPlaying(next as Track);
+    } else {
+      setPlaying(null);
+    }
+  };
+
+  const playPrev = () => {
+    const prev = api.popHistory();
+    if (prev) setPlaying(prev as Track);
   };
 
   const unlockOfficial = () => {
@@ -263,7 +281,7 @@ export const RecoveryCoolerTracks = () => {
         {(view === 'all' || view === 'official') && (
           <PlaylistColumn
             title="Playlist 2 · Recovery Cooler Officials"
-            subtitle={officialLocked ? 'For Coffee Givers ☕ — 10 official soundtracks' : '10 official soundtracks'}
+            subtitle={officialLocked ? '10 official soundtracks · locked' : '10 official soundtracks'}
             tracks={officialFiltered}
             locked={officialLocked}
             onPlay={play}
@@ -281,7 +299,7 @@ export const RecoveryCoolerTracks = () => {
               <div className="flex items-center gap-2 font-medium text-sm">
                 <ListMusic className="h-4 w-4" /> Play Queue ({queue.length})
               </div>
-              <Button size="sm" variant="ghost" onClick={() => setQueue([])}>
+              <Button size="sm" variant="ghost" onClick={() => api.clear()}>
                 <Trash2 className="h-3 w-3 mr-1" /> Clear
               </Button>
             </div>
@@ -292,7 +310,7 @@ export const RecoveryCoolerTracks = () => {
                   <span className="max-w-[140px] truncate">{t.title}</span>
                   <span className="font-mono text-muted-foreground">{t.duration}</span>
                   <button
-                    onClick={() => setQueue((q) => q.filter((_, idx) => idx !== i))}
+                    onClick={() => api.removeAt(i)}
                     className="text-muted-foreground hover:text-destructive"
                     aria-label="Remove from queue"
                   >
@@ -318,6 +336,11 @@ export const RecoveryCoolerTracks = () => {
                 <p className="text-xs text-white/70">{playing.tag} · {playing.duration}</p>
               </div>
               <div className="flex gap-1 shrink-0">
+                {history.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={playPrev} className="text-white hover:bg-white/10">
+                    <SkipBack className="h-4 w-4 mr-1" /> Prev
+                  </Button>
+                )}
                 {queue.length > 0 && (
                   <Button variant="ghost" size="sm" onClick={playNext} className="text-white hover:bg-white/10">
                     <SkipForward className="h-4 w-4 mr-1" /> Next ({queue.length})
