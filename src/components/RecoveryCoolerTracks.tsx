@@ -130,46 +130,82 @@ interface PlaylistColumnProps {
   onUnlock?: () => void;
 }
 
-const PlaylistColumn = ({ title, subtitle, tracks, locked, onPlay, onQueue, onUnlock }: PlaylistColumnProps) => (
-  <div className="space-y-3 flex-1 min-w-0">
-    <div className="flex items-start justify-between gap-2">
-      <div>
-        <h3 className="text-base font-semibold flex items-center gap-2">
-          {locked && <Lock className="h-4 w-4 text-amber-500" />}
-          {title}
-        </h3>
-        <p className="text-xs text-muted-foreground">{subtitle}</p>
+const PlaylistColumn = ({ title, subtitle, tracks, locked, onPlay, onQueue, onUnlock }: PlaylistColumnProps) => {
+  const [showAll, setShowAll] = useState(false);
+  const [page, setPage] = useState(0);
+  const PAGE = 4;
+  const totalPages = Math.max(1, Math.ceil(tracks.length / PAGE));
+  const visibleFew = tracks.slice(page * PAGE, page * PAGE + PAGE);
+
+  return (
+    <div className="space-y-3 flex-1 min-w-0">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h3 className="text-base font-semibold flex items-center gap-2">
+            {locked && <Lock className="h-4 w-4 text-amber-500" />}
+            {title}
+          </h3>
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
+        </div>
+        <div className="flex gap-1 shrink-0">
+          {locked && onUnlock && (
+            <Button size="sm" variant="outline" onClick={onUnlock}>
+              <Coffee className="h-3 w-3 mr-1" /> Unlock
+            </Button>
+          )}
+          {tracks.length > PAGE && (
+            <Button size="sm" variant="ghost" onClick={() => setShowAll((s) => !s)} className="text-xs">
+              {showAll ? 'Collapse' : `View all (${tracks.length})`}
+            </Button>
+          )}
+        </div>
       </div>
-      {locked && onUnlock && (
-        <Button size="sm" variant="outline" onClick={onUnlock} className="shrink-0">
-          <Coffee className="h-3 w-3 mr-1" /> Unlock
-        </Button>
+
+      {tracks.length === 0 ? (
+        <p className="text-sm text-muted-foreground italic py-4 text-center">No tracks match.</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {(showAll ? tracks : visibleFew).map((t) => (
+              <TrackCard
+                key={t.youtubeId}
+                track={t}
+                locked={locked}
+                onPlay={() => onPlay(t)}
+                onQueue={() => onQueue(t)}
+              />
+            ))}
+          </div>
+          {!showAll && tracks.length > PAGE && (
+            <div className="flex items-center justify-between pt-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="h-8"
+              >
+                <SkipBack className="h-3 w-3 mr-1" /> Prev
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                Page {page + 1} / {totalPages}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+                className="h-8"
+              >
+                Next <SkipForward className="h-3 w-3 ml-1" />
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
-
-    {tracks.length === 0 ? (
-      <p className="text-sm text-muted-foreground italic py-4 text-center">No tracks match.</p>
-    ) : (
-      <div
-        className="flex gap-3 overflow-x-auto overscroll-x-contain pb-2 sm:grid sm:grid-cols-1 sm:overflow-visible snap-x snap-mandatory -mx-2 px-2"
-        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y' }}
-        onTouchStartCapture={(e) => e.stopPropagation()}
-        onPointerDownCapture={(e) => e.stopPropagation()}
-      >
-        {tracks.map((t) => (
-          <div key={t.youtubeId} className="snap-start shrink-0 sm:shrink w-[75vw] max-w-[240px] sm:w-auto">
-            <TrackCard
-              track={t}
-              locked={locked}
-              onPlay={() => onPlay(t)}
-              onQueue={() => onQueue(t)}
-            />
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
+  );
+};
 
 export const RecoveryCoolerTracks = () => {
   const { user } = useAuth();
