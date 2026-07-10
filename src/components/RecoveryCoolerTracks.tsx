@@ -74,7 +74,7 @@ interface TrackCardProps {
 }
 
 const TrackCard = ({ track, locked, onPlay, onQueue }: TrackCardProps) => (
-  <Card className="min-w-[220px] sm:min-w-0 overflow-hidden hover:shadow-lg transition-all group">
+  <Card className="w-full overflow-hidden hover:shadow-lg transition-all group">
     <div className={`relative h-28 bg-gradient-to-br ${track.gradient}`}>
       <img
         src={thumb(track.youtubeId)}
