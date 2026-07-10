@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
 import { useTheme } from 'next-themes';
+import ProfileNotificationsCard from '@/components/ProfileNotificationsCard';
 
 
 const profileSchema = z.object({
