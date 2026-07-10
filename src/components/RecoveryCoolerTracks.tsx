@@ -150,9 +150,14 @@ const PlaylistColumn = ({ title, subtitle, tracks, locked, onPlay, onQueue, onUn
     {tracks.length === 0 ? (
       <p className="text-sm text-muted-foreground italic py-4 text-center">No tracks match.</p>
     ) : (
-      <div className="flex gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-1 sm:overflow-visible snap-x snap-mandatory">
+      <div
+        className="flex gap-3 overflow-x-auto overscroll-x-contain pb-2 sm:grid sm:grid-cols-1 sm:overflow-visible snap-x snap-mandatory -mx-2 px-2"
+        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y' }}
+        onTouchStartCapture={(e) => e.stopPropagation()}
+        onPointerDownCapture={(e) => e.stopPropagation()}
+      >
         {tracks.map((t) => (
-          <div key={t.youtubeId} className="snap-start shrink-0 sm:shrink w-[220px] sm:w-auto">
+          <div key={t.youtubeId} className="snap-start shrink-0 sm:shrink w-[75vw] max-w-[240px] sm:w-auto">
             <TrackCard
               track={t}
               locked={locked}

@@ -28,6 +28,18 @@
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+
+    <!-- OneSignal Web Push -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "0715c933-8377-4152-ab1b-0812354086e5",
+          allowLocalhostAsSecureOrigin: true,
+        });
+      });
+    </script>
     <meta property="og:title" content="RecoveryCooler">
   <meta name="twitter:title" content="RecoveryCooler">
   <meta property="og:description" content="A supportive app to help manage gambling urges through guided meditation, spending tracking, and mindful recovery tools.">

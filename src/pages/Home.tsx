@@ -321,9 +321,28 @@ const Home = () => {
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between gentle-fade-in">
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{appName}</h1>
-            <p className="text-sm text-muted-foreground mt-1">Welcome back, {user?.email?.split('@')[0]}</p>
+          <div className="flex items-center gap-3">
+            {/* Animated app logo */}
+            <div className="relative shrink-0">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary via-accent to-primary blur-lg opacity-60 animate-pulse" />
+              <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-xl ring-2 ring-primary/30">
+                <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 text-white drop-shadow-lg animate-[spin_12s_linear_infinite]">
+                  <path
+                    d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="12" cy="12" r="3" fill="currentColor" />
+                </svg>
+              </div>
+            </div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_4s_linear_infinite]">
+                {appName}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">Welcome back, {user?.email?.split('@')[0]}</p>
+            </div>
           </div>
           <div className="flex gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate('/help')} className="rounded-full hover:scale-110 transition-transform">
