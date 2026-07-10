@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { CountrySelector } from '@/components/CountrySelector';
 import { useTheme } from 'next-themes';
+import ProfileNotificationsCard from '@/components/ProfileNotificationsCard';
 
 
 const profileSchema = z.object({
@@ -514,6 +515,9 @@ const Profile = () => {
             </CardContent>
           </Card>
         </div>
+
+        <ProfileNotificationsCard />
+
 
         <Card
           className="gentle-fade-in bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30 cursor-pointer hover:shadow-lg transition-all"
