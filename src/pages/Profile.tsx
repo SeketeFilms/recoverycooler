@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { User, LogOut, Save, Moon, Sun, Edit, Camera, Trash2, Shield, UserCircle, X, CheckCircle2 } from 'lucide-react';
+import { User, LogOut, Save, Moon, Sun, Edit, Camera, Trash2, Shield, UserCircle, X, CheckCircle2, Settings as SettingsIcon, Bell, TrendingUp, BookOpen, AlertCircle, Users, MessageSquare, HelpCircle, Lock, Coffee, FileText, ShieldCheck, ChevronRight } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -443,30 +443,93 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        <Card className="gentle-fade-in">
-          <CardHeader>
-            <CardTitle>Appearance</CardTitle>
-            <CardDescription>Customize how the app looks</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {theme === 'dark' ? (
-                  <Moon className="h-5 w-5 text-primary" />
-                ) : (
-                  <Sun className="h-5 w-5 text-primary" />
-                )}
-                <div>
-                  <Label htmlFor="dark-mode" className="text-base">Dark Mode</Label>
-                  <p className="text-sm text-muted-foreground">Switch between light and dark theme</p>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="gentle-fade-in">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sun className="h-5 w-5 text-primary" />
+                Appearance
+              </CardTitle>
+              <CardDescription>Customize how the app looks</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {theme === 'dark' ? (
+                    <Moon className="h-5 w-5 text-primary" />
+                  ) : (
+                    <Sun className="h-5 w-5 text-primary" />
+                  )}
+                  <div>
+                    <Label htmlFor="dark-mode" className="text-base">Dark Mode</Label>
+                    <p className="text-sm text-muted-foreground">Light or dark theme</p>
+                  </div>
                 </div>
+                <Switch
+                  id="dark-mode"
+                  checked={theme === 'dark'}
+                  onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                />
               </div>
-              <Switch
-                id="dark-mode"
-                checked={theme === 'dark'}
-                onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
-              />
+            </CardContent>
+          </Card>
+
+          <Card className="gentle-fade-in">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <SettingsIcon className="h-5 w-5 text-primary" />
+                Settings
+              </CardTitle>
+              <CardDescription>Recovery tools & preferences</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-2">
+              {[
+                { icon: Bell, label: 'Notifications', path: '/settings/notifications' },
+                { icon: TrendingUp, label: 'Progress', path: '/progress' },
+                { icon: BookOpen, label: 'Journal', path: '/journal' },
+                { icon: AlertCircle, label: 'Crisis', path: '/crisis' },
+                { icon: Users, label: 'Community', path: '/community' },
+                { icon: Shield, label: 'Prevention', path: '/relapse-prevention' },
+                { icon: MessageSquare, label: 'AI Chat', path: '/ai-chat' },
+                { icon: Users, label: 'Partners', path: '/partners' },
+                { icon: TrendingUp, label: 'Reports', path: '/reports' },
+                { icon: HelpCircle, label: 'Help', path: '/help' },
+                { icon: Lock, label: 'Security', path: '/security' },
+                { icon: SettingsIcon, label: 'More', path: '/settings' },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.path}
+                    variant="outline"
+                    size="sm"
+                    className="h-auto py-2 px-2 flex flex-col items-center gap-1 text-xs"
+                    onClick={() => navigate(item.path)}
+                  >
+                    <Icon className="h-4 w-4 text-primary" />
+                    <span className="truncate w-full text-center">{item.label}</span>
+                  </Button>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card
+          className="gentle-fade-in bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30 cursor-pointer hover:shadow-lg transition-all"
+          onClick={() => window.open('https://www.paypal.com/ncp/payment/PW92XP4Y58LJN', '_blank')}
+        >
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-amber-500/20">
+                <Coffee className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-sm">Buy Me a Coffee ☕</p>
+                <p className="text-xs text-muted-foreground">Support the developer</p>
+              </div>
             </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </CardContent>
         </Card>
 
