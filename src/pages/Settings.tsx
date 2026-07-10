@@ -2,6 +2,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { ArrowLeft } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { 
   TrendingUp, 
@@ -206,12 +207,21 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 pb-32">
       <div className="container max-w-4xl mx-auto p-6">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3 mb-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/profile'))}
+            className="rounded-full shrink-0"
+            aria-label="Back"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Settings
             </h1>
-            <p className="text-muted-foreground mt-2">Manage your recovery tools</p>
+            <p className="text-muted-foreground mt-1">Manage your recovery tools</p>
           </div>
         </div>
 

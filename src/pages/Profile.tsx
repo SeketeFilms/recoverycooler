@@ -475,43 +475,30 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          <Card className="gentle-fade-in">
+          <Card
+            className="gentle-fade-in cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all"
+            onClick={() => navigate('/settings', { state: { from: '/profile' } })}
+          >
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <SettingsIcon className="h-5 w-5 text-primary" />
                 Settings
               </CardTitle>
-              <CardDescription>Recovery tools & preferences</CardDescription>
+              <CardDescription>All recovery tools & preferences</CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-2">
-              {[
-                { icon: Bell, label: 'Notifications', path: '/settings/notifications' },
-                { icon: TrendingUp, label: 'Progress', path: '/progress' },
-                { icon: BookOpen, label: 'Journal', path: '/journal' },
-                { icon: AlertCircle, label: 'Crisis', path: '/crisis' },
-                { icon: Users, label: 'Community', path: '/community' },
-                { icon: Shield, label: 'Prevention', path: '/relapse-prevention' },
-                { icon: MessageSquare, label: 'AI Chat', path: '/ai-chat' },
-                { icon: Users, label: 'Partners', path: '/partners' },
-                { icon: TrendingUp, label: 'Reports', path: '/reports' },
-                { icon: HelpCircle, label: 'Help', path: '/help' },
-                { icon: Lock, label: 'Security', path: '/security' },
-                { icon: SettingsIcon, label: 'More', path: '/settings' },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Button
-                    key={item.path}
-                    variant="outline"
-                    size="sm"
-                    className="h-auto py-2 px-2 flex flex-col items-center gap-1 text-xs"
-                    onClick={() => navigate(item.path)}
-                  >
-                    <Icon className="h-4 w-4 text-primary" />
-                    <span className="truncate w-full text-center">{item.label}</span>
-                  </Button>
-                );
-              })}
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-full bg-primary/10">
+                    <SettingsIcon className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">Open Settings</p>
+                    <p className="text-xs text-muted-foreground">Notifications, Progress, Journal, Security & more</p>
+                  </div>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </div>
             </CardContent>
           </Card>
         </div>
