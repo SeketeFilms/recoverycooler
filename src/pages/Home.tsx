@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, DollarSign, Shield, HelpCircle, LogOut, MessageSquare, AlertCircle } from 'lucide-react';
+import { Sparkles, DollarSign, Shield, HelpCircle, LogOut, MessageSquare, AlertCircle, Bell } from 'lucide-react';
 import AppReviews from '@/components/AppReviews';
 const motivationalQuotes = {
   gambling: [
@@ -322,18 +322,19 @@ const Home = () => {
         {/* Header */}
         <div className="flex items-center justify-between gentle-fade-in">
           <div className="flex items-center gap-3">
-            {/* Animated app logo */}
+            {/* Black & white heartbeat logo */}
             <div className="relative shrink-0">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary via-accent to-primary blur-lg opacity-60 animate-pulse" />
-              <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-xl ring-2 ring-primary/30">
-                <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 text-white drop-shadow-lg animate-[spin_12s_linear_infinite]">
+              <div className="relative w-14 h-14 rounded-2xl bg-foreground flex items-center justify-center shadow-xl ring-2 ring-foreground/20 heartbeat-logo">
+                <svg viewBox="0 0 48 24" fill="none" className="w-10 h-6 text-background">
                   <path
-                    d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"
+                    d="M0 12 L10 12 L13 4 L18 20 L23 8 L28 16 L32 12 L48 12"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    className="heartbeat-trace"
                   />
-                  <circle cx="12" cy="12" r="3" fill="currentColor" />
                 </svg>
               </div>
             </div>
@@ -344,12 +345,10 @@ const Home = () => {
               <p className="text-sm text-muted-foreground mt-1">Welcome back, {user?.email?.split('@')[0]}</p>
             </div>
           </div>
-          <div className="flex gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/help')} className="rounded-full hover:scale-110 transition-transform">
-              <HelpCircle className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleSignOut} className="rounded-full hover:scale-110 transition-transform">
-              <LogOut className="h-5 w-5" />
+          <div className="flex gap-2">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/notifications')} className="rounded-full hover:scale-110 transition-transform relative" aria-label="Notifications">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary animate-pulse" />
             </Button>
           </div>
         </div>
