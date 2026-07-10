@@ -163,4 +163,35 @@ All colors MUST be HSL.
     0% { background-position: 0% center; }
     100% { background-position: 200% center; }
   }
+
+  /* Reduced motion — tone down decorative animations for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+    .breathe-animation,
+    .wave-pulse,
+    .wave-animation {
+      animation: none !important;
+    }
+  }
+
+  /* Manual reduced-motion opt-in (toggled by adding .reduce-motion to <html>) */
+  html.reduce-motion *,
+  html.reduce-motion *::before,
+  html.reduce-motion *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html.reduce-motion .breathe-animation,
+  html.reduce-motion .wave-pulse,
+  html.reduce-motion .wave-animation {
+    animation: none !important;
+  }
 }
