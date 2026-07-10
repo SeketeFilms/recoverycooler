@@ -516,6 +516,9 @@ const Profile = () => {
           </Card>
         </div>
 
+        <ProfileNotificationsCard />
+
+
         <Card
           className="gentle-fade-in bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30 cursor-pointer hover:shadow-lg transition-all"
           onClick={() => window.open('https://www.paypal.com/ncp/payment/PW92XP4Y58LJN', '_blank')}
