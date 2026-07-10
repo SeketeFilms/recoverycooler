@@ -164,6 +164,26 @@ All colors MUST be HSL.
     100% { background-position: 200% center; }
   }
 
+  /* Heartbeat logo pulse + trace draw */
+  @keyframes heartbeat-pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 hsl(var(--foreground) / 0.35); }
+    15% { transform: scale(1.06); box-shadow: 0 0 0 6px hsl(var(--foreground) / 0); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.04); }
+    60% { transform: scale(1); }
+  }
+  .heartbeat-logo { animation: heartbeat-pulse 1.6s ease-in-out infinite; }
+
+  @keyframes heartbeat-trace {
+    0% { stroke-dashoffset: 120; opacity: 0.4; }
+    40% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: -120; opacity: 0.4; }
+  }
+  .heartbeat-trace {
+    stroke-dasharray: 120;
+    animation: heartbeat-trace 1.6s ease-in-out infinite;
+  }
+
   /* Reduced motion — tone down decorative animations for accessibility */
   @media (prefers-reduced-motion: reduce) {
     *,
